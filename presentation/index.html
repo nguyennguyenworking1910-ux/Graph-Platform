@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="vi">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Graph Platform</title>
+<style>
+  :root { --bg: #0a0a0b; --ink: #f2f0ea; --dim: rgba(242, 240, 234, .46); --faint: rgba(242, 240, 234, .16); --accent: #f0a531; --alarm: #ff5a4f; }
+  * { box-sizing: border-box; margin: 0; }
+  html { scroll-snap-type: y mandatory; scroll-behavior: smooth; background: var(--bg); }
+  body { color: var(--ink); font: 400 17px/1.5 -apple-system, "SF Pro Text", "Helvetica Neue", "Segoe UI", Roboto, Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+  section { position: relative; height: 100vh; min-height: 620px; scroll-snap-align: start; display: grid; grid-template-columns: minmax(300px, 34%) 1fr; align-items: center; gap: 3vw; padding: 0 6vw; overflow: hidden; }
+  section.wide { grid-template-columns: 1fr; }
+  canvas { width: 100%; height: 78vh; display: block; }
+  section.wide canvas { position: absolute; inset: 0; height: 100%; }
+  .copy { position: relative; z-index: 1; }
+  .no { font-size: 12px; letter-spacing: .18em; color: var(--dim); margin-bottom: 22px; font-variant-numeric: tabular-nums; }
+  h1 { font-size: clamp(54px, 9vw, 150px); font-weight: 600; letter-spacing: -.045em; line-height: .95; }
+  h2 { font-size: clamp(32px, 4.1vw, 62px); font-weight: 600; letter-spacing: -.03em; line-height: 1.04; }
+  p { color: var(--dim); margin-top: 22px; max-width: 30em; }
+  p b, .say b { color: var(--ink); font-weight: 500; }
+  .say { margin-top: 26px; min-height: 3.2em; font-size: 19px; color: var(--ink); border-left: 1px solid var(--accent); padding-left: 14px; }
+  .facts { margin-top: 30px; display: grid; gap: 10px; font-size: 15px; color: var(--dim); }
+  .facts div { display: flex; gap: 14px; align-items: baseline; border-top: 1px solid var(--faint); padding-top: 10px; }
+  .facts b { color: var(--ink); font-weight: 500; min-width: 7.5em; }
+  .big { font-size: clamp(44px, 6vw, 92px); font-weight: 600; letter-spacing: -.04em; line-height: 1; font-variant-numeric: tabular-nums; }
+  .big small { display: block; font-size: 17px; letter-spacing: 0; color: var(--dim); font-weight: 400; margin-top: 12px; line-height: 1.4; }
+  .hero { text-align: left; align-content: end; padding-bottom: 12vh; }
+  .hero p { font-size: clamp(18px, 1.7vw, 26px); color: var(--ink); max-width: 24em; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; margin-top: 7vh; border-top: 1px solid var(--faint); }
+  .grid > div { padding: 26px 26px 0 0; }
+  .grid .big { font-size: clamp(40px, 5.4vw, 84px); }
+  .grid span { display: block; color: var(--dim); margin-top: 12px; font-size: 15px; max-width: 15em; }
+  .grid .todo .big { color: var(--dim); }
+  table { border-collapse: collapse; width: 100%; margin-top: 6vh; font-size: 16px; }
+  td { border-top: 1px solid var(--faint); padding: 15px 22px 15px 0; vertical-align: top; color: var(--dim); }
+  td:first-child { color: var(--ink); font-weight: 500; width: 9em; font-size: 20px; }
+  td:nth-child(2) { color: var(--ink); width: 22em; }
+  .phases { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; margin-top: 6vh; }
+  .phases div { border-top: 1px solid var(--ink); padding-top: 14px; font-size: 15px; color: var(--dim); }
+  .phases b { display: block; color: var(--ink); font-weight: 500; font-size: 18px; margin-bottom: 6px; }
+  .phases div:nth-child(n+3) { border-top-color: var(--faint); }
+  #bar { position: fixed; left: 0; top: 0; height: 1px; background: var(--accent); width: 0; z-index: 5; }
+  #at { position: fixed; right: 6vw; bottom: 34px; font-size: 12px; letter-spacing: .18em; color: var(--dim); z-index: 5; font-variant-numeric: tabular-nums; }
+  @media (max-width: 860px) { section { grid-template-columns: 1fr; align-content: center; padding: 8vh 7vw; } canvas { height: 46vh; } .grid, .phases { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<div id="bar"></div><div id="at"></div>
+
+<section class="wide hero" data-scene="net">
+  <canvas></canvas>
+  <div class="copy"><h1>Graph<br>Platform</h1><p>Dữ liệu rời rạc của mọi đơn vị. Một mạng chung. Những câu trả lời mà từng bảng riêng lẻ không có.</p></div>
+</section>
+
+<section data-scene="silo">
+  <div class="copy"><div class="no">01 &nbsp; VẤN ĐỀ</div><h2>Mỗi đơn vị chỉ thấy một mảnh.</h2><p>Cùng một người, bốn hệ thống, bốn mã khác nhau. Không ai thấy đủ.</p><div class="say"></div></div>
+  <canvas></canvas>
+</section>
+
+<section data-scene="basics">
+  <div class="copy"><div class="no">02 &nbsp; GRAPH LÀ GÌ</div><h2>Điểm, và đường nối giữa các điểm.</h2><div class="say"></div></div>
+  <canvas></canvas>
+</section>
+
+<section data-scene="flow">
+  <div class="copy"><div class="no">03 &nbsp; PLATFORM LÀM GÌ</div><h2>Một đường ống. Mọi đơn vị. Mọi bài toán.</h2><div class="say"></div></div>
+  <canvas></canvas>
+</section>
+
+<section data-scene="cash">
+  <div class="copy"><div class="no">04 &nbsp; USE CASE &nbsp; MERCHANT QUASI-CASH</div><h2>Cửa hàng bán hàng, hay cửa hàng rút tiền hộ?</h2><p>Quẹt thẻ cho một giao dịch khống, nhận tiền mặt, trả phí. Từng giao dịch trông bình thường. <b>Hình dạng của cả mạng thì không.</b></p>
+    <div class="facts"><div><b>Ít người trả</b>vài người thay vì hàng trăm</div><div><b>Số tiền tròn</b>10, 15, 20 triệu</div><div><b>Lặp lại</b>cùng những người đó, nhiều lần</div></div></div>
+  <canvas></canvas>
+</section>
+
+<section data-scene="cashflow">
+  <div class="copy"><div class="no">05 &nbsp; MERCHANT QUASI-CASH &nbsp; CÁCH LÀM</div><h2>Ba tín hiệu, một thứ hạng.</h2><div class="say"></div><p class="big" style="margin-top:34px;color:var(--ink)">10/10<small>cửa hàng cài sẵn đứng đầu danh sách</small></p><p>Trên dữ liệu mô phỏng 20.000 khách hàng, 400 cửa hàng.</p></div>
+  <canvas></canvas>
+</section>
+
+<section data-scene="movie">
+  <div class="copy"><div class="no">06 &nbsp; USE CASE &nbsp; MOVIE RECOMMENDATION</div><h2>Người cùng gu với bạn đã xem gì?</h2><div class="say"></div></div>
+  <canvas></canvas>
+</section>
+
+<section data-scene="hit">
+  <div class="copy"><div class="no">07 &nbsp; MOVIE RECOMMENDATION &nbsp; KẾT QUẢ</div><h2>Gợi ý trúng gần gấp đôi.</h2><p>Trong 10 phim gợi ý có phim khách thật sự xem sau đó. So với cách gợi ý phim đang đông người xem.</p><div class="facts"><div><b>42 phim</b>đang chiếu tại Việt Nam 2025-2026</div><div><b>Rạp là một điểm</b>CGV, Galaxy, Beta nằm trong cùng mạng</div><div><b>Giải thích được</b>mỗi gợi ý chỉ ra ai cùng gu đã xem</div></div></div>
+  <canvas></canvas>
+</section>
+
+<section data-scene="ring">
+  <div class="copy"><div class="no">08 &nbsp; USE CASE &nbsp; FRAUD DETECTION</div><h2>Tám tài khoản. Một chiếc điện thoại. Tiền đi vòng.</h2><div class="say"></div><p class="big" style="margin-top:34px;color:var(--ink)">10/10<small>nhóm cài sẵn được tìm ra</small></p></div>
+  <canvas></canvas>
+</section>
+
+<section data-scene="serve">
+  <div class="copy"><div class="no">09 &nbsp; ĐÍCH ĐẾN</div><h2>Sản phẩm hỏi. Platform trả lời ngay.</h2><p>Hôm nay kết quả được tính theo đợt. Việc của nhóm: đưa ba use case thành một service realtime gắn vào sản phẩm.</p><div class="say"></div></div>
+  <canvas></canvas>
+</section>
+
+<section class="wide" data-scene="count">
+  <div class="copy"><div class="no">10 &nbsp; HIỆN CÓ GÌ</div><h2>Nền đã chạy. Phần còn lại là của chúng ta.</h2>
+    <div class="grid">
+      <div><div class="big" data-to="27">0</div><span>bài toán chạy bằng file cấu hình</span></div>
+      <div><div class="big" data-to="115">0</div><span>test tự động</span></div>
+      <div><div class="big" data-to="2">0</div><span>loại database đã nối thật: PostgreSQL, BigQuery</span></div>
+      <div class="todo"><div class="big" data-to="0">0</div><span>API realtime. Agents chưa chạy model thật. Chưa lên cloud.</span></div>
+    </div></div>
+</section>
+
+<section class="wide" data-scene="none">
+  <div class="copy"><div class="no">11 &nbsp; NHÓM VÀ LỘ TRÌNH</div><h2>Bốn người, bốn giai đoạn.</h2>
+    <table>
+      <tr><td>Nguyên</td><td>PM. Agents, data engineering, data science</td><td>Tool, harness, memory của agents. Chất lượng ba use case.</td></tr>
+      <tr><td>Thảo</td><td>Agents, data engineering, data analysis</td><td>Nối nguồn thật, mapping, đo và báo cáo kết quả.</td></tr>
+      <tr><td>Duy</td><td>Product owner. UX/UI, growth, marketing</td><td>Trải nghiệm sản phẩm, câu chuyện pitching, khách hàng đầu tiên.</td></tr>
+      <tr><td>Khang</td><td>Hạ tầng và production</td><td>Docker, CI/CD, cloud, API service, giám sát.</td></tr>
+    </table>
+    <div class="phases">
+      <div><b>1 &nbsp; Nền chung</b>Docker, CI, nguồn dữ liệu thật đầu tiên.</div>
+      <div><b>2 &nbsp; Ba use case</b>Chạy theo đợt trên dữ liệu thật, có số đo.</div>
+      <div><b>3 &nbsp; Realtime</b>API service, dưới 200 ms.</div>
+      <div><b>4 &nbsp; Production</b>Giám sát, bảo mật, khách hàng pilot.</div>
+    </div></div>
+</section>
+
+<script>
+const INK = "#f2f0ea", DIM = "rgba(242,240,234,.46)", FAINT = "rgba(242,240,234,.16)", ACCENT = "#f0a531", ALARM = "#ff5a4f";
+const still = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ease = (x) => (x <= 0 ? 0 : x >= 1 ? 1 : x * x * (3 - 2 * x));
+const span = (t, a, b) => ease((t - a) / (b - a));
+const rand = (seed) => () => ((seed = (seed * 1664525 + 1013904223) % 4294967296) / 4294967296);
+const mix = (a, b, k) => a + (b - a) * k;
+
+function pen(c, w, h) {
+  const u = Math.min(w, h);
+  const P = {
+    line(x1, y1, x2, y2, color = DIM, width = 1, dash) { c.beginPath(); c.setLineDash(dash || []); c.moveTo(x1 * w, y1 * h); c.lineTo(x2 * w, y2 * h); c.strokeStyle = color; c.lineWidth = width; c.stroke(); c.setLineDash([]); },
+    part(x1, y1, x2, y2, k, color, width, dash) { P.line(x1, y1, mix(x1, x2, k), mix(y1, y2, k), color, width, dash); },
+    dot(x, y, r, color = INK) { c.beginPath(); c.arc(x * w, y * h, r, 0, 7); c.fillStyle = color; c.fill(); },
+    ring(x, y, r, color = INK, width = 1.2) { c.beginPath(); c.arc(x * w, y * h, r, 0, 7); c.strokeStyle = color; c.lineWidth = width; c.stroke(); },
+    box(x, y, s, color = INK, fill) { c.beginPath(); c.rect(x * w - s, y * h - s, 2 * s, 2 * s); if (fill) { c.fillStyle = fill; c.fill(); } c.strokeStyle = color; c.lineWidth = 1.2; c.stroke(); },
+    gem(x, y, s, color = INK) { c.beginPath(); c.moveTo(x * w, y * h - s); c.lineTo(x * w + s, y * h); c.lineTo(x * w, y * h + s); c.lineTo(x * w - s, y * h); c.closePath(); c.strokeStyle = color; c.lineWidth = 1.2; c.stroke(); },
+    bar(x, y, len, color = INK, hollow) { c.beginPath(); c.rect(x * w - len / 2, y * h - 4, len, 8); if (hollow) { c.setLineDash([3, 3]); c.strokeStyle = color; c.lineWidth = 1.2; c.stroke(); c.setLineDash([]); } else { c.fillStyle = color; c.fill(); } },
+    text(s, x, y, color = DIM, size = 13, align = "center", weight = 400) { c.font = `${weight} ${Math.round(size * (w > 760 ? 1.15 : 1))}px -apple-system, "Helvetica Neue", Arial, sans-serif`; c.fillStyle = color; c.textAlign = align; c.fillText(s, x * w, y * h); },
+    alpha(a, fn) { c.save(); c.globalAlpha = Math.max(0, Math.min(1, a)); fn(); c.restore(); },
+    u,
+  };
+  return P;
+}
+
+const scenes = {
+  // scattered points drift, then find each other
+  net(P, t) {
+    const r = rand(7), pts = [];
+    for (let i = 0; i < 90; i++) pts.push([r(), r(), r() * 6.3, 0.4 + r()]);
+    const reach = 0.02 + 0.15 * span(t, 0.4, 5);
+    const at = pts.map(([x, y, ph, sp]) => [x + 0.012 * Math.sin(t * 0.25 * sp + ph), y + 0.016 * Math.cos(t * 0.2 * sp + ph)]);
+    for (let i = 0; i < at.length; i++)
+      for (let j = i + 1; j < at.length; j++) {
+        const d = Math.hypot(at[i][0] - at[j][0], (at[i][1] - at[j][1]) * 0.6);
+        if (d < reach) P.alpha((1 - d / reach) * 0.5, () => P.line(at[i][0], at[i][1], at[j][0], at[j][1], (i * 7 + j) % 23 === 0 ? ACCENT : INK, 0.8));
+      }
+    at.forEach(([x, y], i) => P.alpha(0.75, () => P.dot(x, y, i % 11 === 0 ? 2.6 : 1.5, i % 11 === 0 ? ACCENT : INK)));
+  },
+
+  // four systems, one person under four ids; the rows meet
+  silo(P, t, say) {
+    const T = t % 11, units = [["Tín dụng", "C000123"], ["Ví thanh toán", "U88-4471"], ["Bảo hiểm", "H-45210"], ["Vé xem phim", "MB70093"]];
+    const k = span(T, 2.2, 5), done = span(T, 5, 6.2);
+    units.forEach(([name, id], i) => {
+      const y = 0.16 + i * 0.2, a = span(T, i * 0.25, i * 0.25 + 0.8);
+      P.alpha(a, () => {
+        P.text(name, 0.06, y - 0.045, INK, 14, "left", 500);
+        for (let row = 0; row < 4; row++) P.line(0.06, y + row * 0.026, 0.36, y + row * 0.026, row === 1 ? ACCENT : FAINT, row === 1 ? 1.4 : 1);
+        P.text(id, 0.365, y + 0.026 + 0.008, ACCENT, 12, "left");
+      });
+      if (k > 0) { P.part(0.47, y + 0.026, 0.76, 0.46, k, done ? FAINT : ACCENT, 1); P.dot(mix(0.47, 0.76, k), mix(y + 0.026, 0.46, k), 3, ACCENT); }
+    });
+    P.alpha(done, () => { P.dot(0.76, 0.46, 13, ACCENT); P.text("một khách hàng", 0.76, 0.46 + 0.075, INK, 15, "center", 500); P.text("dùng 4 đơn vị", 0.76, 0.46 + 0.115, DIM, 13); });
+    say(T < 2.2 ? "Bốn bảng, bốn mã, không liên quan gì nhau." : T < 5 ? "Platform nhận ra <b>cùng một người</b> qua số điện thoại, email, giấy tờ." : "Từ đây mọi đơn vị nhìn thấy cùng một khách hàng.");
+  },
+
+  // node, edge, and the first thing a graph shows that a table hides
+  basics(P, t, say) {
+    const T = t % 13, a = span(T, 0, 1), b = span(T, 2.5, 3.5), d = span(T, 5.5, 6.5), e = span(T, 8.5, 9.5);
+    P.alpha(a, () => { P.ring(0.24, 0.34, 15); P.text("Người", 0.24, 0.34 - 0.07, INK, 14); });
+    P.alpha(b, () => { P.box(0.72, 0.34, 14); P.text("Cửa hàng", 0.72, 0.34 - 0.07, INK, 14); });
+    if (b) { P.part(0.275, 0.34, 0.685, 0.34, span(T, 3.3, 4.3), INK, 1.4); P.alpha(span(T, 4, 4.6), () => P.text("trả tiền  12 lần", 0.48, 0.325, DIM, 12)); if (T > 4.3) P.dot(mix(0.275, 0.685, (T * 0.5) % 1), 0.34, 2.5, INK); }
+    P.alpha(d, () => { P.gem(0.48, 0.66, 13); P.text("Thiết bị", 0.48, 0.66 + 0.085, INK, 14); });
+    if (d) P.part(0.255, 0.375, 0.455, 0.63, span(T, 6.3, 7.2), DIM, 1, [5, 4]);
+    P.alpha(e, () => { P.ring(0.78, 0.82, 15, ACCENT); P.text("Người khác", 0.78, 0.82 + 0.085, ACCENT, 14); });
+    if (e) P.part(0.745, 0.8, 0.51, 0.67, span(T, 9.3, 10.2), ACCENT, 1.4, [5, 4]);
+    say(T < 2.5 ? "<b>Node</b>: một người, một cửa hàng, một thiết bị." : T < 5.5 ? "<b>Edge</b>: quan hệ giữa hai node. Ai trả tiền cho ai, bao nhiêu lần." : T < 8.5 ? "Thiết bị cũng là một node. Ai dùng nó là một edge." : "Hai người <b>dùng chung một thiết bị</b>. Bảng không cho thấy. Graph thì có.");
+  },
+
+  // the pipeline: scattered rows converge, merge, connect, answer
+  flow(P, t, say) {
+    const stops = [["Nguồn", 0.07], ["Chuẩn hóa", 0.29], ["Nối danh tính", 0.5], ["Graph", 0.71], ["Câu trả lời", 0.93]], y0 = 0.46, r = rand(3), live = [];
+    P.line(0.07, y0, 0.93, y0, FAINT, 1);
+    for (let i = 0; i < 46; i++) {
+      const lane = (r() - 0.5) * 0.52, sp = 0.05 + r() * 0.03, x = 0.07 + ((t * sp + r()) % 1) * 0.86;
+      const squeeze = 1 - span(x, 0.09, 0.29) * 0.55 - span(x, 0.4, 0.5) * 0.3, y = y0 + lane * squeeze;
+      if (x > 0.5 && i % 2) continue; // records of the same person became one
+      live.push([x, y]); P.alpha(0.9, () => P.dot(x, y, 2, x > 0.71 ? ACCENT : INK));
+    }
+    live.forEach((a, i) => live.forEach((b, j) => { if (j > i && a[0] > 0.6 && b[0] > 0.6 && Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.075) P.alpha(0.5, () => P.line(a[0], a[1], b[0], b[1], INK, 0.8)); }));
+    const now = Math.floor((t % 15) / 3);
+    stops.forEach(([name, x], i) => { P.line(x, y0 - 0.33, x, y0 + 0.33, i === now ? DIM : FAINT, 1, [2, 5]); P.text(name, x, y0 + 0.41, i === now ? INK : DIM, 14, "center", i === now ? 500 : 400); });
+    say(["Kéo từ file, PostgreSQL, BigQuery. Mỗi nguồn một kiểu.", "Đưa về <b>một bộ từ vựng chung</b>. Agents đề xuất, engine kiểm rồi mới nạp.", "Nhiều bản ghi của một người thành <b>một node</b>.", "Người, cửa hàng, thiết bị, giao dịch nối thành <b>một mạng</b>.", "Mỗi bài toán là <b>một file cấu hình</b> trên cùng mạng đó."][now]);
+  },
+
+  // a normal shop next to one used to cash out
+  cash(P, t) {
+    const r = rand(11), shop = (cx, n, color, big) => {
+      P.box(cx, 0.46, 15, color);
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * 6.283 + r() * 0.3, rad = 0.2 + r() * 0.1, x = cx + Math.cos(a) * rad * 0.62, y = 0.46 + Math.sin(a) * rad;
+        P.alpha(big ? 0.9 : 0.5, () => P.line(x, y, cx, 0.46, big ? color : FAINT, big ? 1.3 : 0.7));
+        P.ring(x, y, big ? 7 : 3.5, big ? INK : DIM, 1);
+        const sp = big ? 0.55 : 0.07 + r() * 0.05, k = (t * sp + r()) % 1;
+        if (big || k < 0.5) P.dot(mix(x, cx, big ? k : k * 2), mix(y, 0.46, big ? k : k * 2), big ? 4.5 : 1.6, big ? color : INK);
+        if (big && k > 0.3 && k < 0.75) P.alpha(1 - Math.abs(k - 0.52) * 4, () => P.text(["10.000.000", "20.000.000", "15.000.000", "10.000.000", "20.000.000"][i], x, y - 0.045, color, 12));
+      }
+    };
+    shop(0.26, 34, INK, false); shop(0.75, 5, ACCENT, true);
+    P.text("Cửa hàng bình thường", 0.26, 0.9, INK, 14, "center", 500); P.text("nhiều người, số lẻ, thưa", 0.26, 0.945, DIM, 13);
+    P.text("Cửa hàng bị dùng để rút tiền", 0.75, 0.9, ACCENT, 14, "center", 500); P.text("5 người, số tròn, dồn dập", 0.75, 0.945, DIM, 13);
+  },
+
+  // three signals become one rank
+  cashflow(P, t, say) {
+    const T = t % 12, rows = [["Số người trả", 0.92, 0.08, "hàng trăm", "5"], ["Tỷ lệ số tiền tròn", 0.06, 1, "6%", "100%"], ["Tỷ lệ lặp lại", 0.12, 0.9, "12%", "90%"]];
+    rows.forEach(([name, a, b, la, lb], i) => {
+      const y = 0.14 + i * 0.17, k = span(T, i * 1.2, i * 1.2 + 1.2);
+      P.alpha(span(T, i * 1.2, i * 1.2 + 0.5), () => {
+        P.text(name, 0.05, y - 0.03, INK, 14, "left", 500);
+        P.line(0.05, y + 0.012, 0.05 + 0.62 * a * k, y + 0.012, DIM, 5); P.text(la, 0.07 + 0.62 * a * k, y + 0.019, DIM, 12, "left");
+        P.line(0.05, y + 0.05, 0.05 + 0.62 * b * k, y + 0.05, ACCENT, 5); P.text(lb, 0.07 + 0.62 * b * k, y + 0.057, ACCENT, 12, "left");
+      });
+    });
+    const k = span(T, 4.5, 7), r = rand(5);
+    P.alpha(span(T, 4.2, 5), () => P.text("Thứ hạng 400 cửa hàng", 0.05, 0.69, INK, 14, "left", 500));
+    for (let i = 0; i < 60; i++) {
+      const hot = i % 6 === 0, x0 = 0.05 + r() * 0.9, x1 = hot ? 0.05 + (i / 6) * 0.018 : 0.26 + r() * 0.69;
+      P.alpha(span(T, 4.5, 5), () => P.line(mix(x0, x1, k), 0.74, mix(x0, x1, k), 0.74 + (hot ? 0.13 : 0.05 + r() * 0.04), hot ? ACCENT : FAINT, hot ? 2.5 : 1.5));
+    }
+    P.alpha(span(T, 7, 7.8), () => { P.text("10 cửa hàng đầu", 0.05, 0.93, ACCENT, 13, "left"); P.text("phần còn lại", 0.95, 0.93, DIM, 13, "right"); });
+    say(T < 4.5 ? "Mỗi cửa hàng được đo ba thứ, <b>so với mọi cửa hàng khác</b>." : "Gộp lại thành một điểm, xếp hạng. Người rà soát bắt đầu từ trên xuống.");
+  },
+
+  // who watched what, and what they watched next
+  movie(P, t, say) {
+    const T = t % 15, seen = [["Tron: Ares", 0.24], ["Avatar: Lửa và Tro Tàn", 0.5], ["Mùi Phở", 0.76]], peers = [0.16, 0.39, 0.62, 0.85], next = [["Mickey 17", 0.3, [0, 1, 2]], ["Superman", 0.55, [1, 3]], ["Quán Kỳ Nam", 0.8, [3]]];
+    const links = [[0, 0], [0, 1], [1, 0], [1, 1], [2, 1], [2, 2], [3, 2], [3, 0]];
+    seen.forEach(([name, y], i) => { const k = span(T, 0.5 + i * 0.6, 1.3 + i * 0.6); P.part(0.1, 0.5, 0.3, y, k, INK, 1.3); P.alpha(k, () => { P.bar(0.33, y, 26); P.text(name, 0.33, y - 0.035, INK, 13); }); });
+    P.dot(0.08, 0.5, 11, INK); P.text("Bạn", 0.08, 0.5 + 0.07, INK, 14, "center", 500);
+    links.forEach(([p, s], i) => P.part(0.58, peers[p], 0.36, seen[s][1], span(T, 3.6 + i * 0.15, 4.6 + i * 0.15), FAINT, 1));
+    peers.forEach((y, i) => P.alpha(span(T, 3.4 + i * 0.2, 4 + i * 0.2), () => P.ring(0.6, y, 8, DIM)));
+    P.alpha(span(T, 4, 5), () => P.text("người cùng gu", 0.6, 0.06, DIM, 13));
+    next.forEach(([name, y, who], i) => {
+      who.forEach((p) => P.part(0.62, peers[p], 0.84, y, span(T, 6.5 + i * 0.4, 7.6 + i * 0.4), FAINT, 1));
+      const win = i === 0 ? span(T, 9.5, 10.5) : 0;
+      P.alpha(span(T, 7 + i * 0.4, 7.8 + i * 0.4), () => { P.bar(0.87, y, 26, win ? ACCENT : INK, !win); P.text(name, 0.87, y - 0.035, win ? ACCENT : INK, 13, "center", win ? 500 : 400); P.text(`${who.length} người`, 0.87, y + 0.05, DIM, 12); });
+    });
+    if (T > 10.3) { const k = span(T, 10.3, 11.6); P.part(0.1, 0.47, 0.83, 0.285, k, ACCENT, 1.4, [4, 4]); P.alpha(k, () => P.text("gợi ý", 0.47, 0.34, ACCENT, 13)); }
+    say(T < 3.4 ? "Bạn đã xem ba phim." : T < 6.5 ? "Bốn người khác <b>xem giống bạn</b>." : T < 9.5 ? "Họ còn xem những phim bạn chưa xem." : "Phim được nhiều người cùng gu xem nhất thành <b>gợi ý</b>, kèm lý do.");
+  },
+
+  // hit rate against the popularity baseline
+  hit(P, t) {
+    const T = t % 9, rows = [["Gợi ý phim đang đông người xem", 0.33, DIM], ["Gợi ý theo người cùng gu", 0.61, ACCENT]];
+    rows.forEach(([name, v, color], i) => {
+      const y = 0.3 + i * 0.3, k = span(T, 0.4 + i * 1.3, 2.4 + i * 1.3);
+      P.text(name, 0.06, y - 0.06, i ? INK : DIM, 15, "left", 500);
+      P.line(0.06, y, 0.94, y, FAINT, 14); P.line(0.06, y, 0.06 + 0.88 * v * k, y, color, 14);
+      P.text(`${Math.round(v * k * 100)}%`, 0.06 + 0.88 * v * k + 0.02, y + 0.012, color, 26, "left", 600);
+    });
+    P.alpha(span(T, 3.6, 4.4), () => P.text("3.478 khách hàng được kiểm, mỗi người 10 gợi ý", 0.06, 0.86, DIM, 13, "left"));
+  },
+
+  // eight accounts, one phone, money going round
+  ring(P, t, say) {
+    const T = t % 12, n = 8, at = (i) => [0.5 + 0.34 * Math.cos((i / n) * 6.283 - 1.57), 0.5 + 0.36 * Math.sin((i / n) * 6.283 - 1.57)], loop = [0, 2, 4, 6];
+    for (let i = 0; i < n; i++) { const [x, y] = at(i); P.part(x, y, 0.5, 0.5, span(T, 2.4 + i * 0.12, 3.4 + i * 0.12), DIM, 1, [5, 4]); }
+    P.alpha(span(T, 2.2, 3), () => { P.gem(0.5, 0.5, 13, INK); P.text("1 điện thoại", 0.5, 0.5 + 0.085, INK, 13); });
+    loop.forEach((a, i) => { const [x1, y1] = at(a), [x2, y2] = at(loop[(i + 1) % loop.length]), k = span(T, 5.5 + i * 0.5, 6.5 + i * 0.5); P.part(x1, y1, x2, y2, k, ACCENT, 1.5); if (T > 7.5) P.dot(mix(x1, x2, (t * 0.6) % 1), mix(y1, y2, (t * 0.6) % 1), 4, ACCENT); });
+    for (let i = 0; i < n; i++) { const [x, y] = at(i); P.alpha(span(T, i * 0.15, 0.6 + i * 0.15), () => { P.dot(x, y, 10, "#0a0a0b"); P.ring(x, y, 10, loop.includes(i) && T > 5.5 ? ACCENT : INK); }); }
+    say(T < 2.2 ? "Tám tài khoản, nhìn riêng thì bình thường." : T < 5.5 ? "Cả tám <b>đăng nhập từ cùng một điện thoại</b>." : "Tiền chuyển qua bốn tài khoản rồi <b>quay về chỗ cũ</b>.");
+  },
+
+  // one realtime request through the service
+  serve(P, t, say) {
+    const T = t % 6, stores = [["Kết quả đã tính", 0.24], ["Feature mới nhất", 0.5], ["Neo4j", 0.76]], go = span(T, 0.4, 1.4), fan = span(T, 1.4, 2.4), back = span(T, 2.6, 3.8);
+    P.box(0.1, 0.5, 20); P.text("Sản phẩm", 0.1, 0.5 + 0.1, INK, 14, "center", 500);
+    P.box(0.46, 0.5, 20, ACCENT); P.text("API service", 0.46, 0.5 + 0.1, ACCENT, 14, "center", 500);
+    P.line(0.14, 0.5, 0.42, 0.5, FAINT, 1);
+    stores.forEach(([name, y]) => { P.line(0.5, 0.5, 0.78, y, FAINT, 1); P.line(0.79, y - 0.045, 0.79, y + 0.045, INK, 1.2); P.text(name, 0.81, y + 0.008, INK, 14, "left"); if (fan > 0 && fan < 1) P.dot(mix(0.5, 0.78, fan), mix(0.5, y, fan), 3, ACCENT); });
+    if (go > 0 && go < 1) P.dot(mix(0.14, 0.42, go), 0.5, 4, INK);
+    if (back > 0 && back < 1) P.dot(mix(0.42, 0.14, back), 0.5, 4, ACCENT);
+    const ms = Math.round(Math.min(Math.max(T - 0.4, 0) / 3.4, 1) * 140);
+    P.text(`${ms} ms`, 0.28, 0.44, back >= 1 ? ACCENT : DIM, 22, "center", 600);
+    P.alpha(span(T, 3.8, 4.2), () => P.text("rủi ro cao  ·  3 lý do", 0.1, 0.3, ACCENT, 13));
+    say("Cổng thanh toán hỏi về một cửa hàng. App hỏi nên gợi ý phim gì. <b>Cùng một service</b>.");
+  },
+};
+
+const sections = [...document.querySelectorAll("section")];
+let current = null, started = 0;
+function fit(canvas) {
+  const d = Math.min(devicePixelRatio || 1, 2), w = canvas.clientWidth, h = canvas.clientHeight;
+  if (canvas.width !== w * d) { canvas.width = w * d; canvas.height = h * d; }
+  const c = canvas.getContext("2d"); c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, w, h); return [c, w, h];
+}
+function frame(now) {
+  if (current) {
+    const scene = scenes[current.dataset.scene], canvas = current.querySelector("canvas"), box = current.querySelector(".say");
+    if (scene && canvas) {
+      const [c, w, h] = fit(canvas), t = still ? 99 : (now - started) / 1000;
+      scene(pen(c, w, h), still && current.dataset.scene !== "net" ? 10.9 : t, (html) => { if (box && box.dataset.now !== html) { box.dataset.now = html; box.innerHTML = html; } });
+    }
+  }
+  requestAnimationFrame(frame);
+}
+function count(section) {
+  section.querySelectorAll("[data-to]").forEach((el) => {
+    const to = +el.dataset.to, t0 = performance.now();
+    (function tick(now) { const k = still ? 1 : ease((now - t0) / 1400); el.textContent = Math.round(to * k); if (k < 1) requestAnimationFrame(tick); })(t0);
+  });
+}
+const watch = new IntersectionObserver((seen) => seen.forEach((e) => {
+  if (!e.isIntersecting) return;
+  current = e.target; started = performance.now();
+  const i = sections.indexOf(current);
+  document.getElementById("at").textContent = `${String(i + 1).padStart(2, "0")} / ${sections.length}`;
+  document.getElementById("bar").style.width = `${((i + 1) / sections.length) * 100}%`;
+  if (current.dataset.scene === "count") count(current);
+}), { threshold: 0.55 });
+sections.forEach((s) => watch.observe(s));
+addEventListener("keydown", (e) => {
+  const step = { ArrowDown: 1, PageDown: 1, " ": 1, ArrowRight: 1, ArrowUp: -1, PageUp: -1, ArrowLeft: -1 }[e.key];
+  if (!step) return;
+  e.preventDefault();
+  sections[Math.max(0, Math.min(sections.length - 1, sections.indexOf(current) + step))].scrollIntoView();
+});
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
