@@ -1,0 +1,12 @@
+.git
+.venv
+.tools
+data
+data_full
+data_mid
+tests
+infra
+**/__pycache__
+.env
+presentation
+checklist

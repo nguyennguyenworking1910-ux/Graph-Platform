@@ -1,0 +1,5 @@
+region             = "ap-southeast-1"
+vpc_id             = "vpc-..."
+private_subnet_ids = ["subnet-...", "subnet-..."]
+monthly_budget_usd = 300
+alert_email        = "you@example.com"

@@ -1,0 +1,56 @@
+# Local stack: Neo4j, the web interface, and a one-off job that builds demo data.
+#   cp .env.example .env            set NEO4J_PASSWORD
+#   docker compose up -d neo4j
+#   docker compose run --rm setup   mock data -> trunk -> identity -> graph -> every problem (about 15 minutes)
+#   docker compose run --rm app user admin --name "Admin" --role admin --tenant alpha_group
+#   docker compose up -d app        http://localhost:8501
+x-app: &app
+  build: .
+  entrypoint: ["gp"]
+  environment:
+    GP_NEO4J_URI: bolt://neo4j:7687
+    GP_NEO4J_PASSWORD: ${NEO4J_PASSWORD:?set NEO4J_PASSWORD in .env}
+    GP_NEO4J_IMPORT_DIR: /neo4j-import
+    STREAMLIT_SERVER_HEADLESS: "true"
+    STREAMLIT_SERVER_ADDRESS: 0.0.0.0
+  volumes:
+    - data:/data
+    - neo4j-import:/neo4j-import
+    - ./conf:/app/conf
+  depends_on:
+    neo4j:
+      condition: service_healthy
+
+services:
+  neo4j:
+    image: neo4j:5.26-community
+    environment:
+      NEO4J_AUTH: neo4j/${NEO4J_PASSWORD:?set NEO4J_PASSWORD in .env}
+      NEO4J_server_memory_heap_max__size: 2G
+    ports:
+      - "127.0.0.1:7474:7474"
+      - "127.0.0.1:7687:7687"
+    volumes:
+      - neo4j-data:/data
+      - neo4j-import:/var/lib/neo4j/import
+    healthcheck:
+      test: ["CMD-SHELL", "cypher-shell -u neo4j -p \"$${NEO4J_AUTH#neo4j/}\" 'RETURN 1' >/dev/null"]
+      interval: 10s
+      timeout: 10s
+      retries: 20
+
+  app:
+    <<: *app
+    command: ["ui"]
+    ports:
+      - "127.0.0.1:8501:8501"
+
+  setup:
+    <<: *app
+    profiles: ["setup"]
+    entrypoint: ["/app/scripts/demo-data.sh"]
+
+volumes:
+  data:
+  neo4j-data:
+  neo4j-import:
