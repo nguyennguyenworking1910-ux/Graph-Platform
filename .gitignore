@@ -17,7 +17,6 @@ terraform.tfvars
 data_mid/
 .tools/
 conf/users.yaml
-checklist/
 .tools
 .DS_Store
 !.env.example
