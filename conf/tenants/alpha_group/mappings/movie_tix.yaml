@@ -1,0 +1,58 @@
+source: movie_tix
+domain: movies
+version: 1
+tables:
+  - table: members
+    nodes:
+      - type: Party
+        subtype: person
+        key: {col: member_id}
+        unique: true
+        time: {col: joined, tf: ["parse_timestamp:%Y/%m/%d"]}
+        attrs:
+          full_name: {col: nickname}
+      - {type: Identifier, subtype: phone, key: {col: phone, tf: [normalize_phone]}, attrs: {value: {col: phone, tf: [normalize_phone]}}}
+      - {type: Identifier, subtype: email, key: {col: email, tf: [normalize_email]}, attrs: {value: {col: email, tf: [normalize_email]}}}
+    edges:
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: member_id}}
+        dst: {type: Identifier, subtype: phone, key: {col: phone, tf: [normalize_phone]}}
+        time: {col: joined, tf: ["parse_timestamp:%Y/%m/%d"]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: member_id}}
+        dst: {type: Identifier, subtype: email, key: {col: email, tf: [normalize_email]}}
+        time: {col: joined, tf: ["parse_timestamp:%Y/%m/%d"]}
+  - table: tickets
+    nodes:
+      - {type: Item, subtype: movie, key: {col: movie_code}, attrs: {title: {col: movie_title}, category: {col: genre}}}
+      - {type: Device, subtype: mobile, key: {col: device_id}}
+      # the cinema site is a merchant; its merchant code links it to the same business in other sources
+      - {type: Party, subtype: merchant, key: {col: cinema_code}, attrs: {trade_name: {col: cinema_name}, category: {const: cinema}}}
+      - {type: Identifier, subtype: merchant_code, key: {col: cinema_code}, attrs: {value: {col: cinema_code}}}
+    edges:
+      - type: PURCHASES
+        src: {type: Party, key: {col: member_id}}
+        dst: {type: Item, key: {col: movie_code}}
+        key: {col: ticket_id}
+        time: {col: purchased_at, tf: [epoch_ms]}
+        attrs:
+          amount: {col: price}
+          quantity: {col: seats}
+      - type: USES
+        src: {type: Party, key: {col: member_id}}
+        dst: {type: Device, subtype: mobile, key: {col: device_id}}
+        time: {col: purchased_at, tf: [epoch_ms]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: cinema_code}}
+        dst: {type: Identifier, subtype: merchant_code, key: {col: cinema_code}}
+        time: {const: "2023-01-01 00:00:00", tf: [parse_timestamp]}
+      - type: TRANSACTS
+        src: {type: Party, key: {col: member_id}}
+        dst: {type: Party, key: {col: cinema_code}}
+        key: {col: ticket_id}
+        time: {col: purchased_at, tf: [epoch_ms]}
+        attrs:
+          amount: {col: price}
+          currency: {const: VND}
+          channel: {const: cinema}
+          status: {const: success}

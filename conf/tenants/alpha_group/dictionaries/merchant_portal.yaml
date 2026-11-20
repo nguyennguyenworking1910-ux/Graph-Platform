@@ -1,0 +1,128 @@
+source: merchant_portal
+domain: merchant
+tables:
+- name: chargebacks
+  description: chargebacks table of merchant_portal
+  primary_key:
+  - cb_id
+  columns:
+  - name: cb_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of chargebacks
+    maps_to: Event.key
+  - name: merchant_code
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of chargebacks, references merchants.merchant_code
+    references: merchants.merchant_code
+  - name: amount
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of chargebacks
+    maps_to: Event.amount
+  - name: cb_date
+    dtype: DATE
+    semantic_type: date
+    description: date of chargebacks
+    maps_to: Event.time
+- name: merchant_loans
+  description: merchant_loans table of merchant_portal
+  primary_key:
+  - loan_id
+  columns:
+  - name: loan_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of merchant_loans
+    maps_to: Event.key
+  - name: merchant_code
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of merchant_loans, references merchants.merchant_code
+    references: merchants.merchant_code
+  - name: principal
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of merchant_loans
+    maps_to: Event.amount
+  - name: disb_date
+    dtype: DATE
+    semantic_type: date
+    description: date of merchant_loans
+    maps_to: Event.time
+  - name: term_months
+    dtype: BIGINT
+    semantic_type: numeric
+    description: numeric of merchant_loans
+    maps_to: Event.term_months
+- name: merchant_repayments
+  description: merchant_repayments table of merchant_portal
+  columns:
+  - name: loan_id
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of merchant_repayments, references merchant_loans.loan_id
+    references: merchant_loans.loan_id
+    maps_to: Event.key
+  - name: period_no
+    dtype: BIGINT
+    semantic_type: numeric
+    description: numeric of merchant_repayments
+    maps_to: Event.key
+  - name: snapshot_date
+    dtype: DATE
+    semantic_type: date
+    description: date of merchant_repayments
+    maps_to: Event.time
+  - name: dpd
+    dtype: BIGINT
+    semantic_type: numeric
+    description: numeric of merchant_repayments
+    maps_to: Event.days_past_due
+- name: merchants
+  description: merchants table of merchant_portal
+  primary_key:
+  - merchant_code
+  columns:
+  - name: merchant_code
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of merchants
+    maps_to: Party.key
+  - name: biz_name
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of merchants
+    maps_to: Party.full_name
+  - name: mcc_category
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of merchants
+    maps_to: Party.category
+  - name: owner_phone
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of merchants
+    maps_to: Identifier.key
+  - name: owner_national_id
+    dtype: VARCHAR
+    semantic_type: national_id
+    description: national id of merchants
+    pii: true
+    maps_to: Party.key
+  - name: tax_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of merchants
+    maps_to: Identifier.key
+  - name: city
+    dtype: VARCHAR
+    semantic_type: geo
+    description: geo of merchants
+    maps_to: Party.city
+  - name: onboard_date
+    dtype: DATE
+    semantic_type: date
+    description: date of merchants
+    maps_to: Party.time

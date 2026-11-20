@@ -1,0 +1,12 @@
+# Which wallet users will be reported as mule accounts.
+name: mule_account
+owner_domain: payment
+title: "Tài khoản trung gian"
+question: "Tài khoản nào có khả năng bị dùng để nhận và chuyển tiền gian lận?"
+reading: "Điểm càng cao càng đáng kiểm tra."
+family: node_level
+plugin: party_outcome
+target_entity: Party
+as_of: 2025-06-01
+metrics: [auc, ks]
+params: {outcome_event: fraud_case, outcome_status: mule, horizon_months: 6, train_months: 6}

@@ -1,0 +1,12 @@
+# Merchants used for cash-out: few payers, large round amounts, repeated.
+name: merchant_quasi_cash
+owner_domain: merchant
+title: "Merchant rút tiền mặt"
+question: "Merchant nào đang bị dùng để rút tiền mặt qua giao dịch khống?"
+reading: "Dấu hiệu: ít người trả, số tiền tròn, lặp lại nhiều lần."
+family: node_level
+plugin: merchant_quasi_cash
+target_entity: Party
+as_of: 2025-06-01
+metrics: [r_precision]
+params: {round_unit: 1000000, top_payers: 5, min_txn: 20}

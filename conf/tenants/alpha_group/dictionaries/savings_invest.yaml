@@ -1,0 +1,126 @@
+source: savings_invest
+domain: savings
+tables:
+- name: account_closures
+  description: account_closures table of savings_invest
+  columns:
+  - name: closure_id
+    dtype: UINTEGER
+    semantic_type: foreign_key
+    description: foreign key of account_closures, references movements.mov_id
+    references: movements.mov_id
+    maps_to: Event.key
+  - name: client_id
+    dtype: BIGINT
+    semantic_type: foreign_key
+    description: foreign key of account_closures, references clients.client_id
+    references: clients.client_id
+  - name: closed_at
+    dtype: TIMESTAMP
+    semantic_type: timestamp
+    description: timestamp of account_closures
+    maps_to: Event.time
+  - name: reason
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of account_closures
+    maps_to: Event.status
+- name: accounts
+  description: accounts table of savings_invest
+  primary_key:
+  - acct_no
+  columns:
+  - name: acct_no
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of accounts
+    maps_to: Account.key
+  - name: client_id
+    dtype: BIGINT
+    semantic_type: foreign_key
+    description: foreign key of accounts, references clients.client_id
+    references: clients.client_id
+  - name: product
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of accounts
+    maps_to: Item.key
+  - name: opened_at
+    dtype: TIMESTAMP
+    semantic_type: timestamp
+    description: timestamp of accounts
+    maps_to: Account.time
+  - name: product_name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of accounts
+    pii: true
+    maps_to: Item.title
+- name: clients
+  description: clients table of savings_invest
+  columns:
+  - name: client_id
+    dtype: BIGINT
+    semantic_type: foreign_key
+    description: foreign key of clients, references accounts.client_id
+    references: accounts.client_id
+    maps_to: Party.key
+  - name: fullname
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of clients
+    pii: true
+    maps_to: Party.full_name
+  - name: mobile_no
+    dtype: VARCHAR
+    semantic_type: phone
+    description: phone of clients
+    pii: true
+    maps_to: Identifier.key
+  - name: email
+    dtype: VARCHAR
+    semantic_type: email
+    description: email of clients
+    pii: true
+    maps_to: Identifier.key
+  - name: national_id
+    dtype: VARCHAR
+    semantic_type: national_id
+    description: national id of clients
+    pii: true
+    maps_to: Identifier.key
+  - name: opened_at
+    dtype: TIMESTAMP
+    semantic_type: timestamp
+    description: timestamp of clients
+    maps_to: Party.time
+- name: movements
+  description: movements table of savings_invest
+  primary_key:
+  - mov_id
+  columns:
+  - name: mov_id
+    dtype: UINTEGER
+    semantic_type: id
+    description: id of movements
+    maps_to: Event.key
+  - name: acct_no
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of movements, references accounts.acct_no
+    references: accounts.acct_no
+  - name: kind
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of movements
+    maps_to: Event.channel
+  - name: amt
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of movements
+    maps_to: Event.amount
+  - name: ts
+    dtype: TIMESTAMP
+    semantic_type: timestamp
+    description: timestamp of movements
+    maps_to: Event.time

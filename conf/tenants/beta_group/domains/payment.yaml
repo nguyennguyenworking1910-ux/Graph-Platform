@@ -1,0 +1,8 @@
+domain: payment
+product_group: payment
+owner: pay-squad
+sla_hours: 24
+readers: []
+sources:
+  - name: paystream
+    description: "Payment switch transactions"

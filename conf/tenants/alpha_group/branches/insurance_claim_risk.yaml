@@ -1,0 +1,12 @@
+# Which policy holders will file a claim; the basis for risk pricing.
+name: insurance_claim_risk
+owner_domain: insurance
+title: "Rủi ro bồi thường"
+question: "Khách bảo hiểm nào có khả năng yêu cầu bồi thường?"
+reading: "Điểm càng cao, khả năng phát sinh bồi thường càng lớn."
+family: node_level
+plugin: party_outcome
+target_entity: Party
+as_of: 2025-06-01
+metrics: [auc, ks]
+params: {outcome_event: claim, horizon_months: 6, train_months: 9}

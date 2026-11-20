@@ -1,0 +1,8 @@
+domain: insurance
+product_group: financial
+owner: insurance-team
+sla_hours: 24
+readers: []
+sources:
+  - name: insure_hub
+    description: "Policy administration and claims"

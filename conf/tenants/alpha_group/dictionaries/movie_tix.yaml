@@ -1,0 +1,96 @@
+source: movie_tix
+domain: movies
+tables:
+- name: members
+  description: members table of movie_tix
+  primary_key:
+  - member_id
+  columns:
+  - name: member_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of members
+    maps_to: Party.key
+  - name: nickname
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of members
+    pii: true
+    maps_to: Party.full_name
+  - name: phone
+    dtype: VARCHAR
+    semantic_type: phone
+    description: phone of members
+    pii: true
+    maps_to: Identifier.key
+  - name: email
+    dtype: VARCHAR
+    semantic_type: email
+    description: email of members
+    pii: true
+    maps_to: Identifier.key
+  - name: joined
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of members
+    maps_to: Party.time
+- name: tickets
+  description: tickets table of movie_tix
+  primary_key:
+  - ticket_id
+  columns:
+  - name: ticket_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tickets
+  - name: member_id
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of tickets, references members.member_id
+    references: members.member_id
+  - name: movie_code
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tickets
+    maps_to: Item.key
+  - name: movie_title
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tickets
+    maps_to: Item.title
+  - name: genre
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tickets
+    maps_to: Item.category
+  - name: cinema_code
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tickets
+    maps_to: Party.key
+  - name: cinema_name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of tickets
+    pii: true
+    maps_to: Party.trade_name
+  - name: seats
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of tickets
+    maps_to: PURCHASES.quantity
+  - name: price
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of tickets
+    maps_to: PURCHASES.amount
+  - name: purchased_at
+    dtype: VARCHAR
+    semantic_type: timestamp
+    description: timestamp of tickets
+    maps_to: PURCHASES.event_time
+  - name: device_id
+    dtype: VARCHAR
+    semantic_type: device_id
+    description: device id of tickets
+    maps_to: Device.key

@@ -1,0 +1,7 @@
+# Compute treatment for every feature and model of this tenant.
+lookback_days: 365
+windowed_edges: [TRANSACTS, PURCHASES]
+max_degree: 50
+min_weight: 1
+device_fanout: 20
+model_hops: 2

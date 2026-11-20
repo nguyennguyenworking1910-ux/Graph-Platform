@@ -1,0 +1,12 @@
+# Which good borrowers turn 90+ DPD within the horizon; neighbours' defaults are the contagion signal.
+name: credit_early_warning
+owner_domain: credit
+title: "Cảnh báo sớm nợ xấu"
+question: "Khách đang trả tốt nào có thể chuyển xấu trong 6 tháng tới?"
+reading: "Danh sách xếp theo mức rủi ro. Khách có nhiều người quen đã nợ xấu thường đứng cao."
+family: temporal
+plugin: early_warning
+target_entity: Party
+as_of: 2025-06-01
+metrics: [auc, ks]
+params: {horizon_months: 6, train_months: 9, families: [khop, community, degree, shared]}

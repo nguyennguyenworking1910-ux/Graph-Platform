@@ -1,0 +1,12 @@
+# How much a customer will spend over the next 6 months.
+name: customer_ltv
+owner_domain: payment
+title: "Giá trị khách hàng"
+question: "Khách hàng nào sẽ chi tiêu nhiều nhất trong 6 tháng tới?"
+reading: "Cột dự đoán là số tiền ước tính."
+family: node_level
+plugin: party_value
+target_entity: Party
+as_of: 2025-06-01
+metrics: [spearman]
+params: {horizon_months: 6, train_months: 6}

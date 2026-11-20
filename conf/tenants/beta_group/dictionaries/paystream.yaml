@@ -1,0 +1,217 @@
+source: paystream
+domain: payment
+tables:
+- name: tbl_b2b_settlements
+  description: tbl_b2b_settlements table of paystream
+  primary_key:
+  - txnId
+  columns:
+  - name: txnId
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_b2b_settlements
+  - name: fromMerchant
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of tbl_b2b_settlements
+    maps_to: Party.key
+  - name: toMerchant
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of tbl_b2b_settlements
+    maps_to: Party.key
+  - name: amount
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of tbl_b2b_settlements
+    maps_to: TRANSACTS.amount
+  - name: ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of tbl_b2b_settlements
+    maps_to: TRANSACTS.event_time
+- name: tbl_devices
+  description: tbl_devices table of paystream
+  columns:
+  - name: userId
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of tbl_devices, references tbl_users.userId
+    references: tbl_users.userId
+  - name: deviceId
+    dtype: VARCHAR
+    semantic_type: device_id
+    description: device id of tbl_devices
+    maps_to: Device.key
+  - name: firstSeenTs
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of tbl_devices, references tbl_users.signupTs
+    references: tbl_users.signupTs
+    maps_to: Device.time
+- name: tbl_fraud_cases
+  description: tbl_fraud_cases table of paystream
+  primary_key:
+  - caseId
+  columns:
+  - name: caseId
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_fraud_cases
+    maps_to: Event.key
+  - name: userId
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of tbl_fraud_cases, references tbl_users.userId
+    references: tbl_users.userId
+  - name: caseType
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tbl_fraud_cases
+    maps_to: Event.status
+  - name: reportedTs
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of tbl_fraud_cases
+    maps_to: Event.time
+- name: tbl_merchant_payments
+  description: tbl_merchant_payments table of paystream
+  primary_key:
+  - txnId
+  columns:
+  - name: txnId
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_merchant_payments
+  - name: payerUser
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of tbl_merchant_payments, references tbl_users.userId
+    references: tbl_users.userId
+  - name: merchantCode
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of tbl_merchant_payments
+    maps_to: Party.key
+  - name: amount
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of tbl_merchant_payments
+    maps_to: TRANSACTS.amount
+  - name: ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of tbl_merchant_payments
+    maps_to: TRANSACTS.event_time
+  - name: status
+    dtype: VARCHAR
+    semantic_type: status
+    description: status of tbl_merchant_payments
+    maps_to: TRANSACTS.status
+  - name: voucher
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tbl_merchant_payments
+    maps_to: Item.key
+- name: tbl_transfers
+  description: tbl_transfers table of paystream
+  primary_key:
+  - txnId
+  columns:
+  - name: txnId
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_transfers
+  - name: fromUser
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of tbl_transfers, references tbl_users.userId
+    references: tbl_users.userId
+  - name: toUser
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of tbl_transfers, references tbl_users.userId
+    references: tbl_users.userId
+  - name: amountVnd
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of tbl_transfers
+    maps_to: TRANSACTS.amount
+  - name: ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of tbl_transfers
+    maps_to: TRANSACTS.event_time
+  - name: channel
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tbl_transfers
+    maps_to: TRANSACTS.channel
+  - name: status
+    dtype: VARCHAR
+    semantic_type: status
+    description: status of tbl_transfers
+    maps_to: TRANSACTS.status
+  - name: isCrossBorder
+    dtype: BOOLEAN
+    semantic_type: flag
+    description: flag of tbl_transfers
+    maps_to: TRANSACTS.cross_border
+  - name: destCountry
+    dtype: VARCHAR
+    semantic_type: geo
+    description: geo of tbl_transfers
+    maps_to: TRANSACTS.corridor
+  - name: ccy
+    dtype: VARCHAR
+    semantic_type: currency
+    description: currency of tbl_transfers
+    maps_to: TRANSACTS.currency
+- name: tbl_users
+  description: tbl_users table of paystream
+  primary_key:
+  - userId
+  columns:
+  - name: userId
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_users
+    maps_to: Party.key
+  - name: phoneNumber
+    dtype: VARCHAR
+    semantic_type: phone
+    description: phone of tbl_users
+    pii: true
+    maps_to: Identifier.key
+  - name: name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of tbl_users
+    pii: true
+    maps_to: Party.full_name
+  - name: email
+    dtype: VARCHAR
+    semantic_type: email
+    description: email of tbl_users
+    pii: true
+    maps_to: Identifier.key
+  - name: kycId
+    dtype: VARCHAR
+    semantic_type: national_id
+    description: national id of tbl_users
+    pii: true
+    maps_to: Identifier.key
+  - name: signupTs
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of tbl_users
+    maps_to: Party.time
+  - name: referrerUserId
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of tbl_users
+  - name: homeCity
+    dtype: VARCHAR
+    semantic_type: geo
+    description: geo of tbl_users
+    maps_to: Party.city

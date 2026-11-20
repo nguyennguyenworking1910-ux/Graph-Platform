@@ -1,0 +1,12 @@
+# Members buying the same film many times within two hours.
+name: ticket_scalping
+owner_domain: movies
+title: "Đầu cơ vé"
+question: "Tài khoản nào mua cùng một phim rất nhiều lần trong thời gian ngắn?"
+reading: "Số lần mua trong 2 giờ càng lớn càng bất thường."
+family: node_level
+plugin: purchase_velocity
+target_entity: Party
+as_of: 2025-03-01
+metrics: [r_precision]
+params: {edge: PURCHASES, item_subtype: movie, window_hours: 2, min_purchases: 5}

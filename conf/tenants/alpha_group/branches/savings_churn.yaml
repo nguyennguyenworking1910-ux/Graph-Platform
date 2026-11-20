@@ -1,0 +1,12 @@
+# Which savings customers close their account in the next 6 months.
+name: savings_churn
+owner_domain: savings
+title: "Khách sắp rời đi"
+question: "Khách tiết kiệm nào có khả năng đóng tài khoản?"
+reading: "Nên chăm sóc trước những khách đứng đầu danh sách."
+family: node_level
+plugin: party_outcome
+target_entity: Party
+as_of: 2025-06-01
+metrics: [auc, ks]
+params: {outcome_event: churn, horizon_months: 6, train_months: 9}

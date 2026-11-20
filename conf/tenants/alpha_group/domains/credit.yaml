@@ -1,0 +1,8 @@
+domain: credit
+product_group: financial
+owner: credit-risk-team
+sla_hours: 24
+readers: []
+sources:
+  - name: credit_core
+    description: "Loan origination and repayment system"

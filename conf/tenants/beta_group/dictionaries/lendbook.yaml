@@ -1,0 +1,177 @@
+source: lendbook
+domain: credit
+tables:
+- name: tbl_customers
+  description: tbl_customers table of lendbook
+  primary_key:
+  - custId
+  columns:
+  - name: custId
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_customers
+    maps_to: Party.key
+  - name: fullNm
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of tbl_customers
+    maps_to: Party.full_name
+  - name: dob
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of tbl_customers
+    maps_to: Party.birth_date
+  - name: sex
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tbl_customers
+    maps_to: Party.gender
+  - name: idCard
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_customers
+    maps_to: Identifier.key
+  - name: mobile
+    dtype: VARCHAR
+    semantic_type: phone
+    description: phone of tbl_customers
+    pii: true
+    maps_to: Identifier.key
+  - name: emailAddr
+    dtype: VARCHAR
+    semantic_type: email
+    description: email of tbl_customers
+    pii: true
+    maps_to: Identifier.key
+  - name: monthlyIncome
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of tbl_customers
+    maps_to: Party.income
+  - name: job
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tbl_customers
+    maps_to: Party.occupation
+  - name: city
+    dtype: VARCHAR
+    semantic_type: geo
+    description: geo of tbl_customers
+    maps_to: Party.city
+  - name: createdDt
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of tbl_customers
+    maps_to: Party.time
+- name: tbl_loan_applications
+  description: tbl_loan_applications table of lendbook
+  primary_key:
+  - appId
+  columns:
+  - name: appId
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_loan_applications
+    maps_to: Event.key
+  - name: custId
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of tbl_loan_applications
+  - name: productCode
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of tbl_loan_applications
+    maps_to: Item.key
+  - name: productName
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of tbl_loan_applications
+    pii: true
+    maps_to: Item.title
+  - name: reqAmount
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of tbl_loan_applications
+    maps_to: Event.amount
+  - name: term
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of tbl_loan_applications
+    maps_to: Event.term_months
+  - name: appDate
+    dtype: VARCHAR
+    semantic_type: timestamp
+    description: timestamp of tbl_loan_applications
+    maps_to: Event.time
+  - name: decision
+    dtype: VARCHAR
+    semantic_type: status
+    description: status of tbl_loan_applications
+    maps_to: Event.status
+  - name: deviceFp
+    dtype: VARCHAR
+    semantic_type: device_id
+    description: device id of tbl_loan_applications
+    maps_to: Device.key
+- name: tbl_loans
+  description: tbl_loans table of lendbook
+  primary_key:
+  - loanId
+  columns:
+  - name: loanId
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of tbl_loans
+    maps_to: Event.key
+  - name: appId
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of tbl_loans, references tbl_loan_applications.appId
+    references: tbl_loan_applications.appId
+  - name: custId
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of tbl_loans
+  - name: principal
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of tbl_loans
+    maps_to: Event.amount
+  - name: disbDate
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of tbl_loans
+    maps_to: Event.time
+  - name: termMonths
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of tbl_loans
+    maps_to: Event.term_months
+- name: tbl_repayments
+  description: tbl_repayments table of lendbook
+  columns:
+  - name: loanId
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of tbl_repayments, references tbl_loans.loanId
+    references: tbl_loans.loanId
+    maps_to: Event.key
+  - name: periodNo
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of tbl_repayments
+    maps_to: Event.key
+  - name: dueDate
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of tbl_repayments
+  - name: dpd
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of tbl_repayments
+    maps_to: Event.days_past_due
+  - name: snapshotDt
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of tbl_repayments
+    maps_to: Event.time

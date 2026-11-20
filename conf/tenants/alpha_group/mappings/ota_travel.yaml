@@ -1,0 +1,41 @@
+source: ota_travel
+domain: ota
+version: 1
+tables:
+  - table: travellers
+    nodes:
+      - type: Party
+        subtype: person
+        key: {col: traveller_id}
+        unique: true
+        time: {col: registered, tf: [parse_timestamp]}
+        attrs:
+          full_name: {col: contact_name, tf: [trim]}
+      - {type: Identifier, subtype: phone, key: {col: contact_phone, tf: [normalize_phone]}, attrs: {value: {col: contact_phone, tf: [normalize_phone]}}}
+      - {type: Identifier, subtype: email, key: {col: contact_email, tf: [normalize_email]}, attrs: {value: {col: contact_email, tf: [normalize_email]}}}
+    edges:
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: traveller_id}}
+        dst: {type: Identifier, subtype: phone, key: {col: contact_phone, tf: [normalize_phone]}}
+        time: {col: registered, tf: [parse_timestamp]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: traveller_id}}
+        dst: {type: Identifier, subtype: email, key: {col: contact_email, tf: [normalize_email]}}
+        time: {col: registered, tf: [parse_timestamp]}
+  - table: bookings
+    nodes:
+      - {type: Item, subtype: trip, key: {col: trip_code}, attrs: {title: {col: trip_name}, category: {const: trip}}}
+      - {type: Device, subtype: web, key: {col: device}}
+    edges:
+      - type: PURCHASES
+        src: {type: Party, key: {col: traveller_id}}
+        dst: {type: Item, key: {col: trip_code}}
+        key: {col: booking_ref}
+        time: {col: booked_at, tf: [parse_timestamp]}
+        attrs:
+          amount: {col: total_price}
+          voucher_code: {col: promo_code}
+      - type: USES
+        src: {type: Party, key: {col: traveller_id}}
+        dst: {type: Device, subtype: web, key: {col: device}}
+        time: {col: booked_at, tf: [parse_timestamp]}

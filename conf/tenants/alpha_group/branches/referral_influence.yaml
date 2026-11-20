@@ -1,0 +1,12 @@
+# Customers whose referrals bring in the most people, directly and through their referees.
+name: referral_influence
+owner_domain: payment
+title: "Người giới thiệu hiệu quả"
+question: "Khách hàng nào kéo được nhiều người mới nhất?"
+reading: "Tính cả người do họ giới thiệu trực tiếp và gián tiếp."
+family: path_flow
+plugin: flow_centrality
+target_entity: Party
+as_of: 2025-06-01
+metrics: [party_cnt]
+params: {edge: REFERS, party_subtype: person, weight: count, relation: referral}

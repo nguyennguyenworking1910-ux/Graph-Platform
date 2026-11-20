@@ -1,0 +1,135 @@
+source: cinemax
+domain: movies
+version: 1
+tables:
+- table: tbl_members
+  nodes:
+  - type: Party
+    subtype: person
+    key: {col: memberId}
+    unique: true
+    time:
+      col: joined
+      tf: ['parse_timestamp:%Y/%m/%d']
+    attrs:
+      full_name: {col: nickname}
+  - type: Identifier
+    subtype: phone
+    key:
+      col: phone
+      tf: [normalize_phone]
+    attrs:
+      value:
+        col: phone
+        tf: [normalize_phone]
+  - type: Identifier
+    subtype: email
+    key:
+      col: email
+      tf: [normalize_email]
+    attrs:
+      value:
+        col: email
+        tf: [normalize_email]
+  edges:
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: memberId}
+    dst:
+      type: Identifier
+      subtype: phone
+      key:
+        col: phone
+        tf: [normalize_phone]
+    time:
+      col: joined
+      tf: ['parse_timestamp:%Y/%m/%d']
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: memberId}
+    dst:
+      type: Identifier
+      subtype: email
+      key:
+        col: email
+        tf: [normalize_email]
+    time:
+      col: joined
+      tf: ['parse_timestamp:%Y/%m/%d']
+- table: tbl_tickets
+  nodes:
+  - type: Item
+    subtype: movie
+    key: {col: movieCode}
+    attrs:
+      title: {col: movieTitle}
+      category: {col: genre}
+  - type: Device
+    subtype: mobile
+    key: {col: deviceId}
+  - type: Party
+    subtype: merchant
+    key: {col: cinemaCode}
+    attrs:
+      trade_name: {col: cinemaName}
+      category: {const: cinema}
+  - type: Identifier
+    subtype: merchant_code
+    key: {col: cinemaCode}
+    attrs:
+      value: {col: cinemaCode}
+  edges:
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: cinemaCode}
+    dst:
+      type: Identifier
+      subtype: merchant_code
+      key: {col: cinemaCode}
+    time:
+      const: '2023-01-01 00:00:00'
+      tf: [parse_timestamp]
+  - type: TRANSACTS
+    src:
+      type: Party
+      key: {col: memberId}
+    dst:
+      type: Party
+      key: {col: cinemaCode}
+    key: {col: ticketId}
+    time:
+      col: purchasedAt
+      tf: [epoch_ms]
+    attrs:
+      amount: {col: price}
+      currency: {const: VND}
+      channel: {const: cinema}
+      status: {const: success}
+  - type: PURCHASES
+    src:
+      type: Party
+      key: {col: memberId}
+    dst:
+      type: Item
+      key: {col: movieCode}
+    key: {col: ticketId}
+    time:
+      col: purchasedAt
+      tf: [epoch_ms]
+    attrs:
+      amount: {col: price}
+      quantity: {col: seats}
+  - type: USES
+    src:
+      type: Party
+      key: {col: memberId}
+    dst:
+      type: Device
+      subtype: mobile
+      key: {col: deviceId}
+    time:
+      col: purchasedAt
+      tf: [epoch_ms]

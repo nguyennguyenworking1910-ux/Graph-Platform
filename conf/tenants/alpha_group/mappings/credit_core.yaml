@@ -1,0 +1,93 @@
+source: credit_core
+domain: credit
+version: 1
+tables:
+  - table: customers
+    nodes:
+      - type: Party
+        subtype: person
+        key: {col: cust_id}
+        unique: true
+        time: {col: created_dt, tf: ["parse_timestamp:%d/%m/%Y"]}
+        attrs:
+          full_name: {col: full_nm, tf: [trim]}
+          birth_date: {col: dob, tf: ["parse_date:%d/%m/%Y"]}
+          gender: {col: sex, tf: [{map_values: {M: male, F: female}}]}
+          income: {col: monthly_income}
+          occupation: {col: job}
+          city: {col: city}
+      - {type: Identifier, subtype: phone, key: {col: mobile, tf: [normalize_phone]}, attrs: {value: {col: mobile, tf: [normalize_phone]}}}
+      - {type: Identifier, subtype: email, key: {col: email_addr, tf: [normalize_email]}, attrs: {value: {col: email_addr, tf: [normalize_email]}}}
+      - {type: Identifier, subtype: national_id, key: {col: id_card, tf: [digits_only]}, attrs: {value: {col: id_card, tf: [digits_only]}}}
+    edges:
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: cust_id}}
+        dst: {type: Identifier, subtype: phone, key: {col: mobile, tf: [normalize_phone]}}
+        time: {col: created_dt, tf: ["parse_timestamp:%d/%m/%Y"]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: cust_id}}
+        dst: {type: Identifier, subtype: email, key: {col: email_addr, tf: [normalize_email]}}
+        time: {col: created_dt, tf: ["parse_timestamp:%d/%m/%Y"]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: cust_id}}
+        dst: {type: Identifier, subtype: national_id, key: {col: id_card, tf: [digits_only]}}
+        time: {col: created_dt, tf: ["parse_timestamp:%d/%m/%Y"]}
+  - table: loan_applications
+    nodes:
+      - type: Event
+        subtype: application
+        key: {col: app_id}
+        unique: true
+        time: {col: app_date, tf: ["parse_timestamp:%d/%m/%Y %H:%M:%S"]}
+        attrs:
+          amount: {col: req_amount}
+          term_months: {col: term}
+          status: {col: decision, tf: [lower]}
+      - {type: Device, subtype: mobile, key: {col: device_fp}}
+      - {type: Item, subtype: loan_product, key: {col: product_code}, attrs: {title: {col: product_name}, category: {const: loan}}}
+    edges:
+      - type: APPLIES_FOR
+        src: {type: Party, key: {col: cust_id}}
+        dst: {type: Event, key: {col: app_id}}
+        key: {col: app_id}
+        time: {col: app_date, tf: ["parse_timestamp:%d/%m/%Y %H:%M:%S"]}
+      - type: USES
+        src: {type: Party, key: {col: cust_id}}
+        dst: {type: Device, subtype: mobile, key: {col: device_fp}}
+        time: {col: app_date, tf: ["parse_timestamp:%d/%m/%Y %H:%M:%S"]}
+  - table: loans
+    nodes:
+      - type: Event
+        subtype: loan
+        key: {col: loan_id}
+        unique: true
+        time: {col: disb_date, tf: ["parse_timestamp:%d/%m/%Y"]}
+        attrs:
+          amount: {col: principal}
+          term_months: {col: term_months}
+    edges:
+      - type: APPLIES_FOR
+        src: {type: Party, key: {col: cust_id}}
+        dst: {type: Event, key: {col: loan_id}}
+        key: {col: loan_id}
+        time: {col: disb_date, tf: ["parse_timestamp:%d/%m/%Y"]}
+      - type: RELATES_TO
+        src: {type: Event, key: {col: loan_id}}
+        dst: {type: Event, key: {col: app_id}}
+        key: {col: loan_id}
+        time: {col: disb_date, tf: ["parse_timestamp:%d/%m/%Y"]}
+  - table: repayments
+    nodes:
+      - type: Event
+        subtype: loan_performance
+        key: {concat: [loan_id, period_no]}
+        unique: true
+        time: {col: snapshot_dt, tf: ["parse_timestamp:%d/%m/%Y"]}
+        attrs:
+          days_past_due: {col: dpd}
+    edges:
+      - type: RELATES_TO
+        src: {type: Event, key: {concat: [loan_id, period_no]}}
+        dst: {type: Event, key: {col: loan_id}}
+        key: {concat: [loan_id, period_no]}
+        time: {col: snapshot_dt, tf: ["parse_timestamp:%d/%m/%Y"]}

@@ -1,0 +1,12 @@
+# Which merchants a wallet user pays next.
+name: merchant_recommendation
+owner_domain: merchant
+title: "Gợi ý merchant"
+question: "Nên giới thiệu merchant nào cho từng khách hàng?"
+reading: "Mỗi khách có tối đa 10 gợi ý, xếp theo mức phù hợp."
+family: edge_level
+plugin: link_prediction
+target_entity: Party
+as_of: 2025-06-01
+metrics: [hit_rate_at_k, recall_at_k]
+params: {edge: TRANSACTS, target: Party, item_subtype: merchant, test_days: 90, k: 10, peer_weight: 0.5}

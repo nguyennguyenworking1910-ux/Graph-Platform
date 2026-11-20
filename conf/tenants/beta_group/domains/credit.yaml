@@ -1,0 +1,8 @@
+domain: credit
+product_group: financial
+owner: lending-squad
+sla_hours: 24
+readers: []
+sources:
+  - name: lendbook
+    description: "Consumer lending ledger"

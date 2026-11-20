@@ -1,0 +1,113 @@
+source: insure_hub
+domain: insurance
+tables:
+- name: claims
+  description: claims table of insure_hub
+  primary_key:
+  - claim_no
+  columns:
+  - name: claim_no
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of claims
+    maps_to: Event.key
+  - name: policy_no
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of claims, references policies.policy_no
+    references: policies.policy_no
+  - name: holder_no
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of claims, references policy_holders.holder_no
+    references: policy_holders.holder_no
+  - name: claim_amount
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of claims
+    maps_to: Event.amount
+  - name: claim_date
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of claims
+    maps_to: Event.time
+  - name: status
+    dtype: VARCHAR
+    semantic_type: status
+    description: status of claims
+    maps_to: Event.status
+- name: policies
+  description: policies table of insure_hub
+  primary_key:
+  - policy_no
+  columns:
+  - name: policy_no
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of policies
+    maps_to: Account.key
+  - name: holder_no
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of policies, references policy_holders.holder_no
+    references: policy_holders.holder_no
+  - name: product
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of policies
+    maps_to: Item.key
+  - name: product_name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of policies
+    pii: true
+    maps_to: Item.title
+  - name: premium
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of policies
+    maps_to: PURCHASES.amount
+  - name: start_date
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of policies
+    maps_to: Account.time
+- name: policy_holders
+  description: policy_holders table of insure_hub
+  primary_key:
+  - holder_no
+  columns:
+  - name: holder_no
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of policy_holders
+    maps_to: Party.key
+  - name: name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of policy_holders
+    pii: true
+    maps_to: Party.full_name
+  - name: birthdate
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of policy_holders
+    maps_to: Party.birth_date
+  - name: phone
+    dtype: VARCHAR
+    semantic_type: phone
+    description: phone of policy_holders
+    pii: true
+    maps_to: Identifier.key
+  - name: email
+    dtype: VARCHAR
+    semantic_type: email
+    description: email of policy_holders
+    pii: true
+    maps_to: Identifier.key
+  - name: nid
+    dtype: VARCHAR
+    semantic_type: national_id
+    description: national id of policy_holders
+    pii: true
+    maps_to: Identifier.key

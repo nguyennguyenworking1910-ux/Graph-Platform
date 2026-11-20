@@ -1,0 +1,5 @@
+# Gate thresholds of this tenant. Set by the platform owner; mapping specs cannot override them.
+max_key_null_rate: 0.01
+min_time_parse_rate: 0.99
+min_endpoint_coverage: 0.99
+max_duplicate_rate: 0.05

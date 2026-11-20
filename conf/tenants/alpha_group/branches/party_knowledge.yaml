@@ -1,0 +1,12 @@
+# Context documents for question answering and score explanations.
+name: party_knowledge
+owner_domain: payment
+title: "Tóm tắt khách hàng"
+question: "Vì sao một khách hàng được đánh giá như vậy?"
+reading: "Tài liệu tóm tắt quan hệ và hành vi, dùng cho hỏi đáp."
+family: knowledge
+plugin: party_context
+target_entity: Party
+as_of: 2025-06-01
+metrics: [document_cnt]
+params: {limit: 1000, peers: 10}

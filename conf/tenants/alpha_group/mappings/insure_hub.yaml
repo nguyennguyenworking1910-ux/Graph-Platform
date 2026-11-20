@@ -1,0 +1,66 @@
+source: insure_hub
+domain: insurance
+version: 1
+tables:
+  - table: policy_holders
+    nodes:
+      - type: Party
+        subtype: person
+        key: {col: holder_no}
+        unique: true
+        attrs:
+          full_name: {col: name, tf: [trim]}
+          birth_date: {col: birthdate, tf: [parse_date]}
+      - {type: Identifier, subtype: phone, key: {col: phone, tf: [normalize_phone]}, attrs: {value: {col: phone, tf: [normalize_phone]}}}
+      - {type: Identifier, subtype: email, key: {col: email, tf: [normalize_email]}, attrs: {value: {col: email, tf: [normalize_email]}}}
+      - {type: Identifier, subtype: national_id, key: {col: nid, tf: [digits_only]}, attrs: {value: {col: nid, tf: [digits_only]}}}
+    edges:
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: holder_no}}
+        dst: {type: Identifier, subtype: phone, key: {col: phone, tf: [normalize_phone]}}
+        time: {const: "2023-01-01 00:00:00", tf: [parse_timestamp]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: holder_no}}
+        dst: {type: Identifier, subtype: email, key: {col: email, tf: [normalize_email]}}
+        time: {const: "2023-01-01 00:00:00", tf: [parse_timestamp]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: holder_no}}
+        dst: {type: Identifier, subtype: national_id, key: {col: nid, tf: [digits_only]}}
+        time: {const: "2023-01-01 00:00:00", tf: [parse_timestamp]}
+  - table: policies
+    nodes:
+      - {type: Account, subtype: policy, key: {col: policy_no}, unique: true, time: {col: start_date, tf: [parse_timestamp]}, attrs: {status: {const: active}}}
+      - {type: Item, subtype: insurance_product, key: {col: product}, attrs: {title: {col: product_name}, category: {const: insurance}}}
+    edges:
+      - type: OWNS
+        src: {type: Party, key: {col: holder_no}}
+        dst: {type: Account, key: {col: policy_no}}
+        key: {col: policy_no}
+        time: {col: start_date, tf: [parse_timestamp]}
+      - type: PURCHASES
+        src: {type: Party, key: {col: holder_no}}
+        dst: {type: Item, key: {col: product}}
+        key: {col: policy_no}
+        time: {col: start_date, tf: [parse_timestamp]}
+        attrs: {amount: {col: premium}}
+  - table: claims
+    nodes:
+      - type: Event
+        subtype: claim
+        key: {col: claim_no}
+        unique: true
+        time: {col: claim_date, tf: [parse_timestamp]}
+        attrs:
+          amount: {col: claim_amount}
+          status: {col: status, tf: [lower]}
+    edges:
+      - type: APPLIES_FOR
+        src: {type: Party, key: {col: holder_no}}
+        dst: {type: Event, key: {col: claim_no}}
+        key: {col: claim_no}
+        time: {col: claim_date, tf: [parse_timestamp]}
+      - type: RELATES_TO
+        src: {type: Event, key: {col: claim_no}}
+        dst: {type: Account, key: {col: policy_no}}
+        key: {col: claim_no}
+        time: {col: claim_date, tf: [parse_timestamp]}

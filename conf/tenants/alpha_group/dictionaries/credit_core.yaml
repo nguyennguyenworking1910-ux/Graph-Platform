@@ -1,0 +1,179 @@
+source: credit_core
+domain: credit
+tables:
+- name: customers
+  description: customers table of credit_core
+  primary_key:
+  - cust_id
+  columns:
+  - name: cust_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of customers
+    maps_to: Party.key
+  - name: full_nm
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of customers
+    pii: true
+    maps_to: Party.full_name
+  - name: dob
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of customers
+    maps_to: Party.birth_date
+  - name: sex
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of customers
+    maps_to: Party.gender
+  - name: id_card
+    dtype: VARCHAR
+    semantic_type: national_id
+    description: national id of customers
+    pii: true
+    maps_to: Identifier.key
+  - name: mobile
+    dtype: VARCHAR
+    semantic_type: phone
+    description: phone of customers
+    pii: true
+    maps_to: Identifier.key
+  - name: email_addr
+    dtype: VARCHAR
+    semantic_type: email
+    description: email of customers
+    pii: true
+    maps_to: Identifier.key
+  - name: monthly_income
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of customers
+    maps_to: Party.income
+  - name: job
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of customers
+    maps_to: Party.occupation
+  - name: city
+    dtype: VARCHAR
+    semantic_type: geo
+    description: geo of customers
+    maps_to: Party.city
+  - name: created_dt
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of customers
+    maps_to: Party.time
+- name: loan_applications
+  description: loan_applications table of credit_core
+  primary_key:
+  - app_id
+  columns:
+  - name: app_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of loan_applications
+    maps_to: Event.key
+  - name: cust_id
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of loan_applications
+  - name: product_code
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of loan_applications
+    maps_to: Item.key
+  - name: product_name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of loan_applications
+    pii: true
+    maps_to: Item.title
+  - name: req_amount
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of loan_applications
+    maps_to: Event.amount
+  - name: term
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of loan_applications
+    maps_to: Event.term_months
+  - name: app_date
+    dtype: VARCHAR
+    semantic_type: timestamp
+    description: timestamp of loan_applications
+    maps_to: Event.time
+  - name: decision
+    dtype: VARCHAR
+    semantic_type: status
+    description: status of loan_applications
+    maps_to: Event.status
+  - name: device_fp
+    dtype: VARCHAR
+    semantic_type: device_id
+    description: device id of loan_applications
+    maps_to: Device.key
+- name: loans
+  description: loans table of credit_core
+  primary_key:
+  - loan_id
+  columns:
+  - name: loan_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of loans
+    maps_to: Event.key
+  - name: app_id
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of loans, references loan_applications.app_id
+    references: loan_applications.app_id
+  - name: cust_id
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of loans
+  - name: principal
+    dtype: VARCHAR
+    semantic_type: amount
+    description: amount of loans
+    maps_to: Event.amount
+  - name: disb_date
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of loans
+    maps_to: Event.time
+  - name: term_months
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of loans
+    maps_to: Event.term_months
+- name: repayments
+  description: repayments table of credit_core
+  columns:
+  - name: loan_id
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of repayments, references loans.loan_id
+    references: loans.loan_id
+    maps_to: Event.key
+  - name: period_no
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of repayments
+    maps_to: Event.key
+  - name: due_date
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of repayments
+  - name: dpd
+    dtype: VARCHAR
+    semantic_type: numeric
+    description: numeric of repayments
+    maps_to: Event.days_past_due
+  - name: snapshot_dt
+    dtype: VARCHAR
+    semantic_type: date
+    description: date of repayments
+    maps_to: Event.time

@@ -1,0 +1,8 @@
+domain: movies
+product_group: entertainment
+owner: cinema-squad
+sla_hours: 24
+readers: []
+sources:
+  - name: cinemax
+    description: "Cinema ticket sales"

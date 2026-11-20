@@ -1,0 +1,278 @@
+source: paystream
+domain: payment
+version: 1
+tables:
+- table: tbl_users
+  nodes:
+  - type: Party
+    subtype: person
+    key: {col: userId}
+    unique: true
+    time:
+      col: signupTs
+      tf: [epoch_ms]
+    attrs:
+      full_name:
+        col: name
+        tf: [trim]
+      city: {col: homeCity}
+  - type: Identifier
+    subtype: phone
+    key:
+      col: phoneNumber
+      tf: [normalize_phone]
+    attrs:
+      value:
+        col: phoneNumber
+        tf: [normalize_phone]
+  - type: Identifier
+    subtype: email
+    key:
+      col: email
+      tf: [normalize_email]
+    attrs:
+      value:
+        col: email
+        tf: [normalize_email]
+  - type: Identifier
+    subtype: national_id
+    key:
+      col: kycId
+      tf: [digits_only]
+    attrs:
+      value:
+        col: kycId
+        tf: [digits_only]
+  edges:
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: userId}
+    dst:
+      type: Identifier
+      subtype: phone
+      key:
+        col: phoneNumber
+        tf: [normalize_phone]
+    time:
+      col: signupTs
+      tf: [epoch_ms]
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: userId}
+    dst:
+      type: Identifier
+      subtype: email
+      key:
+        col: email
+        tf: [normalize_email]
+    time:
+      col: signupTs
+      tf: [epoch_ms]
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: userId}
+    dst:
+      type: Identifier
+      subtype: national_id
+      key:
+        col: kycId
+        tf: [digits_only]
+    time:
+      col: signupTs
+      tf: [epoch_ms]
+  - type: REFERS
+    src:
+      type: Party
+      key: {col: referrerUserId}
+    dst:
+      type: Party
+      key: {col: userId}
+    time:
+      col: signupTs
+      tf: [epoch_ms]
+    attrs:
+      relation: {const: referral}
+- table: tbl_devices
+  nodes:
+  - type: Device
+    subtype: mobile
+    key: {col: deviceId}
+    time:
+      col: firstSeenTs
+      tf: [epoch_ms]
+  edges:
+  - type: USES
+    src:
+      type: Party
+      key: {col: userId}
+    dst:
+      type: Device
+      subtype: mobile
+      key: {col: deviceId}
+    time:
+      col: firstSeenTs
+      tf: [epoch_ms]
+- table: tbl_transfers
+  edges:
+  - type: TRANSACTS
+    src:
+      type: Party
+      key: {col: fromUser}
+    dst:
+      type: Party
+      key: {col: toUser}
+    key: {col: txnId}
+    time:
+      col: ts
+      tf: [epoch_ms]
+    attrs:
+      amount: {col: amountVnd}
+      currency: {col: ccy}
+      channel: {col: channel}
+      status:
+        col: status
+        tf: [lower]
+      cross_border: {col: isCrossBorder}
+      corridor: {col: destCountry}
+- table: tbl_merchant_payments
+  nodes:
+  - type: Party
+    subtype: merchant
+    key: {col: merchantCode}
+  - type: Identifier
+    subtype: merchant_code
+    key: {col: merchantCode}
+    attrs:
+      value: {col: merchantCode}
+  - type: Item
+    subtype: voucher
+    key: {col: voucher}
+    attrs:
+      title: {col: voucher}
+      category: {const: voucher}
+  edges:
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: merchantCode}
+    dst:
+      type: Identifier
+      subtype: merchant_code
+      key: {col: merchantCode}
+    time:
+      const: '2023-01-01 00:00:00'
+      tf: [parse_timestamp]
+  - type: TRANSACTS
+    src:
+      type: Party
+      key: {col: payerUser}
+    dst:
+      type: Party
+      key: {col: merchantCode}
+    key: {col: txnId}
+    time:
+      col: ts
+      tf: [epoch_ms]
+    attrs:
+      amount: {col: amount}
+      currency: {const: VND}
+      channel: {const: merchant}
+      status:
+        col: status
+        tf: [lower]
+  - type: PURCHASES
+    src:
+      type: Party
+      key: {col: payerUser}
+    dst:
+      type: Item
+      key: {col: voucher}
+    key: {col: txnId}
+    time:
+      col: ts
+      tf: [epoch_ms]
+    attrs:
+      amount: {col: amount}
+      voucher_code: {col: voucher}
+- table: tbl_b2b_settlements
+  nodes:
+  - type: Party
+    subtype: merchant
+    key: {col: fromMerchant}
+  - type: Party
+    subtype: merchant
+    key: {col: toMerchant}
+  - type: Identifier
+    subtype: merchant_code
+    key: {col: fromMerchant}
+    attrs:
+      value: {col: fromMerchant}
+  - type: Identifier
+    subtype: merchant_code
+    key: {col: toMerchant}
+    attrs:
+      value: {col: toMerchant}
+  edges:
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: fromMerchant}
+    dst:
+      type: Identifier
+      subtype: merchant_code
+      key: {col: fromMerchant}
+    time:
+      const: '2023-01-01 00:00:00'
+      tf: [parse_timestamp]
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: toMerchant}
+    dst:
+      type: Identifier
+      subtype: merchant_code
+      key: {col: toMerchant}
+    time:
+      const: '2023-01-01 00:00:00'
+      tf: [parse_timestamp]
+  - type: TRANSACTS
+    src:
+      type: Party
+      key: {col: fromMerchant}
+    dst:
+      type: Party
+      key: {col: toMerchant}
+    key: {col: txnId}
+    time:
+      col: ts
+      tf: [epoch_ms]
+    attrs:
+      amount: {col: amount}
+      currency: {const: VND}
+      channel: {const: b2b}
+- table: tbl_fraud_cases
+  nodes:
+  - type: Event
+    subtype: fraud_case
+    key: {col: caseId}
+    unique: true
+    time:
+      col: reportedTs
+      tf: [epoch_ms]
+    attrs:
+      status: {col: caseType}
+  edges:
+  - type: APPLIES_FOR
+    src:
+      type: Party
+      key: {col: userId}
+    dst:
+      type: Event
+      key: {col: caseId}
+    key: {col: caseId}
+    time:
+      col: reportedTs
+      tf: [epoch_ms]

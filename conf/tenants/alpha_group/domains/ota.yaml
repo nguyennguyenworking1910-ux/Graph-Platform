@@ -1,0 +1,8 @@
+domain: ota
+product_group: entertainment
+owner: travel-team
+sla_hours: 24
+readers: []
+sources:
+  - name: ota_travel
+    description: "Online travel bookings"

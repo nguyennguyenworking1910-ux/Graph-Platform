@@ -1,0 +1,81 @@
+source: merchant_portal
+domain: merchant
+version: 1
+tables:
+  - table: merchants
+    nodes:
+      - type: Party
+        subtype: merchant
+        key: {col: merchant_code}
+        unique: true
+        time: {col: onboard_date, tf: [parse_timestamp]}
+        attrs:
+          full_name: {col: biz_name}
+          trade_name: {col: biz_name}
+          category: {col: mcc_category}
+          city: {col: city}
+      # the owner is a separate person, linked to the business by REFERS
+      - {type: Party, subtype: person, key: {col: owner_national_id, tf: [digits_only]}, time: {col: onboard_date, tf: [parse_timestamp]}}
+      - {type: Identifier, subtype: merchant_code, key: {col: merchant_code}, attrs: {value: {col: merchant_code}}}
+      - {type: Identifier, subtype: tax_id, key: {col: tax_id, tf: [digits_only]}, attrs: {value: {col: tax_id, tf: [digits_only]}}}
+      - {type: Identifier, subtype: phone, key: {col: owner_phone, tf: [normalize_phone]}, attrs: {value: {col: owner_phone, tf: [normalize_phone]}}}
+      - {type: Identifier, subtype: national_id, key: {col: owner_national_id, tf: [digits_only]}, attrs: {value: {col: owner_national_id, tf: [digits_only]}}}
+    edges:
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: merchant_code}}
+        dst: {type: Identifier, subtype: merchant_code, key: {col: merchant_code}}
+        time: {col: onboard_date, tf: [parse_timestamp]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: merchant_code}}
+        dst: {type: Identifier, subtype: tax_id, key: {col: tax_id, tf: [digits_only]}}
+        time: {col: onboard_date, tf: [parse_timestamp]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: owner_national_id, tf: [digits_only]}}
+        dst: {type: Identifier, subtype: phone, key: {col: owner_phone, tf: [normalize_phone]}}
+        time: {col: onboard_date, tf: [parse_timestamp]}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: owner_national_id, tf: [digits_only]}}
+        dst: {type: Identifier, subtype: national_id, key: {col: owner_national_id, tf: [digits_only]}}
+        time: {col: onboard_date, tf: [parse_timestamp]}
+      - type: REFERS
+        src: {type: Party, key: {col: owner_national_id, tf: [digits_only]}}
+        dst: {type: Party, key: {col: merchant_code}}
+        time: {col: onboard_date, tf: [parse_timestamp]}
+        attrs: {relation: {const: owns_business}}
+  - table: chargebacks
+    nodes:
+      - {type: Event, subtype: chargeback, key: {col: cb_id}, unique: true, time: {col: cb_date, tf: [parse_timestamp]}, attrs: {amount: {col: amount}}}
+    edges:
+      - type: APPLIES_FOR
+        src: {type: Party, key: {col: merchant_code}}
+        dst: {type: Event, key: {col: cb_id}}
+        key: {col: cb_id}
+        time: {col: cb_date, tf: [parse_timestamp]}
+  - table: merchant_loans
+    nodes:
+      - type: Event
+        subtype: merchant_loan
+        key: {col: loan_id}
+        unique: true
+        time: {col: disb_date, tf: [parse_timestamp]}
+        attrs: {amount: {col: principal}, term_months: {col: term_months}}
+    edges:
+      - type: APPLIES_FOR
+        src: {type: Party, key: {col: merchant_code}}
+        dst: {type: Event, key: {col: loan_id}}
+        key: {col: loan_id}
+        time: {col: disb_date, tf: [parse_timestamp]}
+  - table: merchant_repayments
+    nodes:
+      - type: Event
+        subtype: merchant_loan_performance
+        key: {concat: [loan_id, period_no]}
+        unique: true
+        time: {col: snapshot_date, tf: [parse_timestamp]}
+        attrs: {days_past_due: {col: dpd}}
+    edges:
+      - type: RELATES_TO
+        src: {type: Event, key: {concat: [loan_id, period_no]}}
+        dst: {type: Event, key: {col: loan_id}}
+        key: {concat: [loan_id, period_no]}
+        time: {col: snapshot_date, tf: [parse_timestamp]}

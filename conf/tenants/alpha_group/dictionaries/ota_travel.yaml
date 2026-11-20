@@ -1,0 +1,85 @@
+source: ota_travel
+domain: ota
+tables:
+- name: bookings
+  description: bookings table of ota_travel
+  primary_key:
+  - booking_ref
+  columns:
+  - name: booking_ref
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of bookings
+  - name: traveller_id
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of bookings, references travellers.traveller_id
+    references: travellers.traveller_id
+  - name: trip_code
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of bookings
+    maps_to: Item.key
+  - name: destination
+    dtype: VARCHAR
+    semantic_type: geo
+    description: geo of bookings
+  - name: trip_name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of bookings
+    pii: true
+    maps_to: Item.title
+  - name: total_price
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of bookings
+    maps_to: PURCHASES.amount
+  - name: booked_at
+    dtype: TIMESTAMP
+    semantic_type: timestamp
+    description: timestamp of bookings
+    maps_to: PURCHASES.event_time
+  - name: promo_code
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of bookings
+    maps_to: PURCHASES.voucher_code
+  - name: device
+    dtype: VARCHAR
+    semantic_type: device_id
+    description: device id of bookings
+    maps_to: Device.key
+- name: travellers
+  description: travellers table of ota_travel
+  primary_key:
+  - traveller_id
+  columns:
+  - name: traveller_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of travellers
+    maps_to: Party.key
+  - name: contact_name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of travellers
+    pii: true
+    maps_to: Party.full_name
+  - name: contact_phone
+    dtype: VARCHAR
+    semantic_type: phone
+    description: phone of travellers
+    pii: true
+    maps_to: Identifier.key
+  - name: contact_email
+    dtype: VARCHAR
+    semantic_type: email
+    description: email of travellers
+    pii: true
+    maps_to: Identifier.key
+  - name: registered
+    dtype: TIMESTAMP
+    semantic_type: timestamp
+    description: timestamp of travellers
+    maps_to: Party.time

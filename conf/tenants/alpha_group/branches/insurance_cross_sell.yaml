@@ -1,0 +1,12 @@
+# Which insurance product a customer takes next.
+name: insurance_cross_sell
+owner_domain: insurance
+title: "Bán thêm bảo hiểm"
+question: "Nên chào sản phẩm bảo hiểm nào cho từng khách?"
+reading: "Mỗi khách có tối đa 2 gợi ý."
+family: edge_level
+plugin: link_prediction
+target_entity: Party
+as_of: 2025-06-01
+metrics: [hit_rate_at_k, recall_at_k]
+params: {edge: PURCHASES, target: Item, item_subtype: insurance_product, test_days: 180, k: 2, peer_weight: 1.0}

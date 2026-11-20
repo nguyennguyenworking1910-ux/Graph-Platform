@@ -1,0 +1,12 @@
+# Layering: large repeated transfers that circulate inside a closed group.
+name: aml_circular_flow
+owner_domain: payment
+title: "Dòng tiền quay vòng"
+question: "Nhóm nào đang chuyển những khoản tiền lớn lòng vòng cho nhau?"
+reading: "Tiền đi một vòng rồi quay lại là dấu hiệu cần xem xét về rửa tiền."
+family: path_flow
+plugin: circular_flow
+target_entity: Party
+as_of: 2025-06-01
+metrics: [precision_at_k, ring_recall]
+params: {amount_quantile: 0.99, min_repeat: 5, min_size: 3, max_size: 50}

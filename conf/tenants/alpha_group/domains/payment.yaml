@@ -1,0 +1,8 @@
+domain: payment
+product_group: payment
+owner: payments-team
+sla_hours: 24
+readers: [credit]
+sources:
+  - name: wallet_pay
+    description: "Wallet: P2P, user-merchant, merchant-merchant, domestic and cross-border"

@@ -1,0 +1,8 @@
+domain: savings
+product_group: financial
+owner: wealth-team
+sla_hours: 24
+readers: []
+sources:
+  - name: savings_invest
+    description: "Savings and investment accounts"

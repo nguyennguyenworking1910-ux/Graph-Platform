@@ -1,0 +1,12 @@
+# Which wallet users will be reported for account takeover.
+name: account_takeover
+owner_domain: payment
+title: "Chiếm đoạt tài khoản"
+question: "Tài khoản nào có nguy cơ bị người khác chiếm quyền?"
+reading: "Điểm càng cao, nguy cơ càng lớn."
+family: node_level
+plugin: party_outcome
+target_entity: Party
+as_of: 2025-06-01
+metrics: [auc, ks]
+params: {outcome_event: fraud_case, outcome_status: takeover, horizon_months: 6, train_months: 6}

@@ -1,0 +1,12 @@
+# Cross-border corridors whose volume jumps against their own history.
+name: corridor_anomaly
+owner_domain: payment
+title: "Tuyến chuyển tiền bất thường"
+question: "Tuyến chuyển tiền ra nước ngoài nào đang tăng đột biến?"
+reading: "Điểm là số lần tăng so với mức thường thấy của chính tuyến đó. Tuyến đứng đầu cần xem trước."
+family: path_flow
+plugin: corridor_anomaly
+target_entity: Party
+as_of: 2025-12-01
+metrics: [growth_max]
+params: {recent_days: 90, min_recent_txn: 30}

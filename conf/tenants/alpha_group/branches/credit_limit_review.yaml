@@ -1,0 +1,12 @@
+# One recommended limit action per current borrower, from the risk and value experiments.
+name: credit_limit_review
+owner_domain: credit
+title: "Rà soát hạn mức"
+question: "Nên tăng, giữ hay giảm hạn mức của từng khách đang vay?"
+reading: "Tăng cho khách rủi ro thấp và chi tiêu nhiều; xem xét giảm cho nhóm rủi ro cao nhất."
+family: node_level
+plugin: limit_review
+target_entity: Party
+as_of: 2025-06-01
+metrics: [increase_cnt]
+params: {risk_experiment: credit_early_warning, value_experiment: customer_ltv, low_risk_quantile: 0.5, high_risk_quantile: 0.9}

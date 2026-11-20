@@ -1,0 +1,12 @@
+# Travellers who repeatedly book the same trip within the hour.
+name: ota_co_booking_groups
+owner_domain: ota
+title: "Nhóm đi cùng nhau"
+question: "Những khách nào thường đặt chỗ cùng nhau?"
+reading: "Mỗi nhóm là những người đặt cùng chuyến trong vòng một giờ."
+family: community
+plugin: co_occurrence_groups
+target_entity: Party
+as_of: 2025-03-01
+metrics: [group_cnt]
+params: {edge: PURCHASES, item_subtype: trip, window_minutes: 60, min_together: 1, max_size: 20}

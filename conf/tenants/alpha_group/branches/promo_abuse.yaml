@@ -1,0 +1,12 @@
+# Device-sharing groups that redeem vouchers together.
+name: promo_abuse
+owner_domain: payment
+title: "Lạm dụng khuyến mãi"
+question: "Nhóm nào đang gom mã khuyến mãi bằng nhiều tài khoản?"
+reading: "Mỗi nhóm dùng chung thiết bị và cùng dùng mã khuyến mãi."
+family: community
+plugin: community_rings
+target_entity: Party
+as_of: 2025-06-01
+metrics: [r_precision]
+params: {min_size: 3, max_size: 30, score: voucher}

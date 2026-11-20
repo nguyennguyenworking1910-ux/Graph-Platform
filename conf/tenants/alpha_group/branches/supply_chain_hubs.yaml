@@ -1,0 +1,12 @@
+# Merchants where B2B money concentrates.
+name: supply_chain_hubs
+owner_domain: merchant
+title: "Đầu mối chuỗi cung ứng"
+question: "Merchant nào là nơi dòng tiền giữa các merchant đổ về nhiều nhất?"
+reading: "Merchant đứng đầu là đầu mối quan trọng của mạng lưới."
+family: path_flow
+plugin: flow_centrality
+target_entity: Party
+as_of: 2025-06-01
+metrics: [top10_inflow_ratio]
+params: {edge: TRANSACTS, party_subtype: merchant, weight: amount}

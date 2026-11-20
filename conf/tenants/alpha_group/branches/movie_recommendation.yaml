@@ -1,0 +1,12 @@
+# Next movies a member will buy; peers' taste is the graph signal.
+name: movie_recommendation
+owner_domain: movies
+title: "Gợi ý phim"
+question: "Nên gợi ý phim nào cho từng khách?"
+reading: "Mỗi khách có 10 phim gợi ý, xếp theo mức phù hợp."
+family: edge_level
+plugin: link_prediction
+target_entity: Party
+as_of: 2025-06-01
+metrics: [hit_rate_at_k, recall_at_k]
+params: {edge: PURCHASES, item_subtype: movie, test_days: 90, k: 10, peer_weight: 0.5}

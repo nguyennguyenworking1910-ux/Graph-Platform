@@ -1,0 +1,202 @@
+source: lendbook
+domain: credit
+version: 1
+tables:
+- table: tbl_customers
+  nodes:
+  - type: Party
+    subtype: person
+    key: {col: custId}
+    unique: true
+    time:
+      col: createdDt
+      tf: ['parse_timestamp:%d/%m/%Y']
+    attrs:
+      full_name:
+        col: fullNm
+        tf: [trim]
+      birth_date:
+        col: dob
+        tf: ['parse_date:%d/%m/%Y']
+      gender:
+        col: sex
+        tf:
+        - map_values: {M: male, F: female}
+      income: {col: monthlyIncome}
+      occupation: {col: job}
+      city: {col: city}
+  - type: Identifier
+    subtype: phone
+    key:
+      col: mobile
+      tf: [normalize_phone]
+    attrs:
+      value:
+        col: mobile
+        tf: [normalize_phone]
+  - type: Identifier
+    subtype: email
+    key:
+      col: emailAddr
+      tf: [normalize_email]
+    attrs:
+      value:
+        col: emailAddr
+        tf: [normalize_email]
+  - type: Identifier
+    subtype: national_id
+    key:
+      col: idCard
+      tf: [digits_only]
+    attrs:
+      value:
+        col: idCard
+        tf: [digits_only]
+  edges:
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: custId}
+    dst:
+      type: Identifier
+      subtype: phone
+      key:
+        col: mobile
+        tf: [normalize_phone]
+    time:
+      col: createdDt
+      tf: ['parse_timestamp:%d/%m/%Y']
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: custId}
+    dst:
+      type: Identifier
+      subtype: email
+      key:
+        col: emailAddr
+        tf: [normalize_email]
+    time:
+      col: createdDt
+      tf: ['parse_timestamp:%d/%m/%Y']
+  - type: HAS_IDENTIFIER
+    src:
+      type: Party
+      key: {col: custId}
+    dst:
+      type: Identifier
+      subtype: national_id
+      key:
+        col: idCard
+        tf: [digits_only]
+    time:
+      col: createdDt
+      tf: ['parse_timestamp:%d/%m/%Y']
+- table: tbl_loan_applications
+  nodes:
+  - type: Event
+    subtype: application
+    key: {col: appId}
+    unique: true
+    time:
+      col: appDate
+      tf: ['parse_timestamp:%d/%m/%Y %H:%M:%S']
+    attrs:
+      amount: {col: reqAmount}
+      term_months: {col: term}
+      status:
+        col: decision
+        tf: [lower]
+  - type: Device
+    subtype: mobile
+    key: {col: deviceFp}
+  - type: Item
+    subtype: loan_product
+    key: {col: productCode}
+    attrs:
+      title: {col: productName}
+      category: {const: loan}
+  edges:
+  - type: APPLIES_FOR
+    src:
+      type: Party
+      key: {col: custId}
+    dst:
+      type: Event
+      key: {col: appId}
+    key: {col: appId}
+    time:
+      col: appDate
+      tf: ['parse_timestamp:%d/%m/%Y %H:%M:%S']
+  - type: USES
+    src:
+      type: Party
+      key: {col: custId}
+    dst:
+      type: Device
+      subtype: mobile
+      key: {col: deviceFp}
+    time:
+      col: appDate
+      tf: ['parse_timestamp:%d/%m/%Y %H:%M:%S']
+- table: tbl_loans
+  nodes:
+  - type: Event
+    subtype: loan
+    key: {col: loanId}
+    unique: true
+    time:
+      col: disbDate
+      tf: ['parse_timestamp:%d/%m/%Y']
+    attrs:
+      amount: {col: principal}
+      term_months: {col: termMonths}
+  edges:
+  - type: APPLIES_FOR
+    src:
+      type: Party
+      key: {col: custId}
+    dst:
+      type: Event
+      key: {col: loanId}
+    key: {col: loanId}
+    time:
+      col: disbDate
+      tf: ['parse_timestamp:%d/%m/%Y']
+  - type: RELATES_TO
+    src:
+      type: Event
+      key: {col: loanId}
+    dst:
+      type: Event
+      key: {col: appId}
+    key: {col: loanId}
+    time:
+      col: disbDate
+      tf: ['parse_timestamp:%d/%m/%Y']
+- table: tbl_repayments
+  nodes:
+  - type: Event
+    subtype: loan_performance
+    key:
+      concat: [loanId, periodNo]
+    unique: true
+    time:
+      col: snapshotDt
+      tf: ['parse_timestamp:%d/%m/%Y']
+    attrs:
+      days_past_due: {col: dpd}
+  edges:
+  - type: RELATES_TO
+    src:
+      type: Event
+      key:
+        concat: [loanId, periodNo]
+    dst:
+      type: Event
+      key: {col: loanId}
+    key:
+      concat: [loanId, periodNo]
+    time:
+      col: snapshotDt
+      tf: ['parse_timestamp:%d/%m/%Y']

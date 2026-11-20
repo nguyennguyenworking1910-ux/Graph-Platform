@@ -1,0 +1,12 @@
+# Which transfers will be disputed.
+name: transaction_fraud
+owner_domain: payment
+title: "Giao dịch đáng ngờ"
+question: "Giao dịch chuyển tiền nào có khả năng bị khiếu nại?"
+reading: "Mỗi dòng là một giao dịch, xếp theo mức đáng ngờ."
+family: edge_level
+plugin: edge_classification
+target_entity: Party
+as_of: 2025-03-01
+metrics: [auc, ks]
+params: {edge: TRANSACTS, label_attribute: status, label_value: disputed, train_days: 120, test_days: 60}

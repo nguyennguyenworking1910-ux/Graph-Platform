@@ -1,0 +1,69 @@
+source: savings_invest
+domain: savings
+version: 1
+tables:
+  - table: clients
+    nodes:
+      - type: Party
+        subtype: person
+        key: {col: client_id}
+        unique: true
+        time: {col: opened_at}
+        attrs:
+          full_name: {col: fullname, tf: [trim]}
+      - {type: Identifier, subtype: phone, key: {col: mobile_no, tf: [normalize_phone]}, attrs: {value: {col: mobile_no, tf: [normalize_phone]}}}
+      - {type: Identifier, subtype: email, key: {col: email, tf: [normalize_email]}, attrs: {value: {col: email, tf: [normalize_email]}}}
+      - {type: Identifier, subtype: national_id, key: {col: national_id, tf: [digits_only]}, attrs: {value: {col: national_id, tf: [digits_only]}}}
+    edges:
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: client_id}}
+        dst: {type: Identifier, subtype: phone, key: {col: mobile_no, tf: [normalize_phone]}}
+        time: {col: opened_at}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: client_id}}
+        dst: {type: Identifier, subtype: email, key: {col: email, tf: [normalize_email]}}
+        time: {col: opened_at}
+      - type: HAS_IDENTIFIER
+        src: {type: Party, key: {col: client_id}}
+        dst: {type: Identifier, subtype: national_id, key: {col: national_id, tf: [digits_only]}}
+        time: {col: opened_at}
+  - table: accounts
+    nodes:
+      - {type: Account, subtype: savings, key: {col: acct_no}, unique: true, time: {col: opened_at}, attrs: {status: {const: active}}}
+      - {type: Item, subtype: savings_product, key: {col: product}, attrs: {title: {col: product_name}, category: {const: savings}}}
+    edges:
+      - type: OWNS
+        src: {type: Party, key: {col: client_id}}
+        dst: {type: Account, key: {col: acct_no}}
+        key: {col: acct_no}
+        time: {col: opened_at}
+      - type: PURCHASES
+        src: {type: Party, key: {col: client_id}}
+        dst: {type: Item, key: {col: product}}
+        key: {col: acct_no}
+        time: {col: opened_at}
+  - table: movements
+    nodes:
+      - type: Event
+        subtype: deposit
+        key: {col: mov_id}
+        unique: true
+        time: {col: ts}
+        attrs:
+          amount: {col: amt}
+          channel: {col: kind, tf: [{map_values: {D: deposit, W: withdrawal}}]}
+    edges:
+      - type: RELATES_TO
+        src: {type: Event, key: {col: mov_id}}
+        dst: {type: Account, key: {col: acct_no}}
+        key: {col: mov_id}
+        time: {col: ts}
+  - table: account_closures
+    nodes:
+      - {type: Event, subtype: churn, key: {col: closure_id}, unique: true, time: {col: closed_at}, attrs: {status: {col: reason}}}
+    edges:
+      - type: APPLIES_FOR
+        src: {type: Party, key: {col: client_id}}
+        dst: {type: Event, key: {col: closure_id}}
+        key: {col: closure_id}
+        time: {col: closed_at}

@@ -1,0 +1,11 @@
+# One profile per customer across every business domain.
+name: customer_360
+owner_domain: payment
+title: "Hồ sơ khách hàng"
+question: "Một khách hàng đang dùng những dịch vụ nào của công ty?"
+reading: "Mỗi dòng là một khách hàng, gộp từ mọi đơn vị."
+family: entity_resolution
+plugin: customer_360
+target_entity: Party
+as_of: 2025-12-01
+metrics: [multi_domain_ratio]

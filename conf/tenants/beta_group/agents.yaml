@@ -1,0 +1,6 @@
+# Agent runtime of this tenant. Claude is called through Amazon Bedrock with the task's IAM role.
+aws_region: ap-southeast-1
+model: anthropic.claude-opus-5-5
+effort: medium
+daily_token_limit: 2000000
+max_repair_rounds: 3

@@ -1,0 +1,12 @@
+# Next trips a traveller will book; peers' bookings are the graph signal.
+name: ota_trip_recommendation
+owner_domain: ota
+title: "Gợi ý chuyến đi"
+question: "Nên gợi ý chuyến đi nào cho từng khách?"
+reading: "Mỗi khách có 10 gợi ý."
+family: edge_level
+plugin: link_prediction
+target_entity: Party
+as_of: 2025-06-01
+metrics: [hit_rate_at_k, recall_at_k]
+params: {edge: PURCHASES, item_subtype: trip, test_days: 180, k: 10, peer_weight: 1.0}

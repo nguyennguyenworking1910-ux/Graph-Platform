@@ -1,0 +1,8 @@
+domain: merchant
+product_group: payment
+owner: merchant-team
+sla_hours: 24
+readers: [payment]
+sources:
+  - name: merchant_portal
+    description: "Merchant onboarding and profiles"

@@ -1,0 +1,12 @@
+# Collusive groups: shared devices plus money moving inside the group.
+name: fraud_ring
+owner_domain: payment
+title: "Nhóm gian lận"
+question: "Những nhóm tài khoản nào đang phối hợp với nhau một cách bất thường?"
+reading: "Mỗi nhóm dùng chung thiết bị và chuyển tiền qua lại nội bộ. Nhóm đứng đầu đáng kiểm tra nhất."
+family: community
+plugin: community_rings
+target_entity: Party
+as_of: 2025-06-01
+metrics: [precision_at_k, ring_recall]
+params: {min_size: 3, max_size: 30}

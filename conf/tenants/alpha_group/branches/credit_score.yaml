@@ -1,0 +1,40 @@
+# Experiment config owned by the credit business unit. Every field here is theirs to change.
+name: credit_score
+owner_domain: credit
+title: "Chấm điểm tín dụng"
+question: "Khoản vay nào có khả năng nợ xấu?"
+reading: "Điểm càng cao, khả năng quá hạn trên 90 ngày càng lớn. Xem các khoản đứng đầu trước."
+family: node_level
+plugin: node_supervised
+target_entity: Party
+
+population:
+  event: loan              # one row per disbursed loan
+  exclude_prior_bad: false
+
+label:
+  outcome_event: loan_performance
+  attribute: days_past_due
+  bad_threshold: 90        # bad = ever 90+ DPD inside the window
+  indeterminate_from: 30   # worst DPD in [30, 90) is neither good nor bad: dropped
+  performance_window_months: 12
+
+split:
+  train: {start: 2023-07-01, end: 2024-06-30}
+  test_fraction: 0.2       # in-time holdout, split by party
+  oot: {start: 2024-07-01, end: 2024-12-31}
+  seed: 7
+
+models:
+  - name: gbdt_profile
+    kind: gbdt
+    families: [profile]
+  - name: gbdt_graph
+    kind: gbdt
+    families: [profile, degree, shared, khop, centrality, community, embedding]
+  - name: graphsage
+    kind: graphsage
+    families: [profile, degree, shared]
+    params: {epochs: 30}
+baseline: gbdt_profile
+metrics: [auc, gini, ks]

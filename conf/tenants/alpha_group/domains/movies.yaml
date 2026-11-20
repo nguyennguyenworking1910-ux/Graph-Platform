@@ -1,0 +1,8 @@
+domain: movies
+product_group: entertainment
+owner: movies-team
+sla_hours: 24
+readers: []
+sources:
+  - name: movie_tix
+    description: "Movie ticketing"

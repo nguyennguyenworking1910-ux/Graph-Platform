@@ -1,0 +1,34 @@
+# Credit score for merchant working-capital loans.
+name: merchant_lending
+owner_domain: merchant
+title: "Chấm điểm vay vốn merchant"
+question: "Khoản vay vốn lưu động nào của merchant có khả năng nợ xấu?"
+reading: "Điểm càng cao, khả năng quá hạn trên 90 ngày càng lớn."
+family: node_level
+plugin: node_supervised
+target_entity: Party
+
+population:
+  event: merchant_loan
+
+label:
+  outcome_event: merchant_loan_performance
+  attribute: days_past_due
+  bad_threshold: 90
+  performance_window_months: 12
+
+split:
+  train: {start: 2023-07-01, end: 2024-06-30}
+  test_fraction: 0.2
+  oot: {start: 2024-07-01, end: 2024-12-31}
+  seed: 7
+
+models:
+  - name: gbdt_profile
+    kind: gbdt
+    families: [profile]
+  - name: gbdt_graph
+    kind: gbdt
+    families: [profile, degree, shared, khop, centrality, community]
+baseline: gbdt_profile
+metrics: [auc, gini, ks]

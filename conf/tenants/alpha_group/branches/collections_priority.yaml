@@ -1,0 +1,12 @@
+# Among borrowers already 30+ days late, who rolls to 90+ within 3 months.
+name: collections_priority
+owner_domain: credit
+title: "Ưu tiên thu hồi nợ"
+question: "Trong các khách đang trễ hạn, ai có khả năng trễ nặng hơn?"
+reading: "Nên liên hệ trước những khách đứng đầu danh sách."
+family: temporal
+plugin: early_warning
+target_entity: Party
+as_of: 2025-06-01
+metrics: [auc, ks]
+params: {horizon_months: 3, train_months: 12, min_current_dpd: 30}

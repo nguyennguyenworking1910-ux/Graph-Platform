@@ -1,0 +1,216 @@
+source: wallet_pay
+domain: payment
+tables:
+- name: b2b_settlements
+  description: b2b_settlements table of wallet_pay
+  primary_key:
+  - txn_id
+  columns:
+  - name: txn_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of b2b_settlements
+  - name: from_merchant
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of b2b_settlements
+    maps_to: Party.key
+  - name: to_merchant
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of b2b_settlements
+    maps_to: Party.key
+  - name: amount
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of b2b_settlements
+    maps_to: TRANSACTS.amount
+  - name: ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of b2b_settlements
+    maps_to: TRANSACTS.event_time
+- name: devices
+  description: devices table of wallet_pay
+  columns:
+  - name: user_id
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of devices, references users.user_id
+    references: users.user_id
+  - name: device_id
+    dtype: VARCHAR
+    semantic_type: device_id
+    description: device id of devices
+    maps_to: Device.key
+  - name: first_seen_ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of devices
+    maps_to: Device.time
+- name: fraud_cases
+  description: fraud_cases table of wallet_pay
+  primary_key:
+  - case_id
+  columns:
+  - name: case_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of fraud_cases
+    maps_to: Event.key
+  - name: user_id
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of fraud_cases, references users.user_id
+    references: users.user_id
+  - name: case_type
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of fraud_cases
+    maps_to: Event.status
+  - name: reported_ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of fraud_cases
+    maps_to: Event.time
+- name: merchant_payments
+  description: merchant_payments table of wallet_pay
+  primary_key:
+  - txn_id
+  columns:
+  - name: txn_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of merchant_payments
+  - name: payer_user
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of merchant_payments, references users.user_id
+    references: users.user_id
+  - name: merchant_code
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of merchant_payments
+    maps_to: Party.key
+  - name: amount
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of merchant_payments
+    maps_to: TRANSACTS.amount
+  - name: ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of merchant_payments
+    maps_to: TRANSACTS.event_time
+  - name: status
+    dtype: VARCHAR
+    semantic_type: status
+    description: status of merchant_payments
+    maps_to: TRANSACTS.status
+  - name: voucher
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of merchant_payments
+    maps_to: Item.key
+- name: transfers
+  description: transfers table of wallet_pay
+  primary_key:
+  - txn_id
+  columns:
+  - name: txn_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of transfers
+  - name: from_user
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of transfers, references users.user_id
+    references: users.user_id
+  - name: to_user
+    dtype: VARCHAR
+    semantic_type: foreign_key
+    description: foreign key of transfers, references users.user_id
+    references: users.user_id
+  - name: amount_vnd
+    dtype: DOUBLE
+    semantic_type: amount
+    description: amount of transfers
+    maps_to: TRANSACTS.amount
+  - name: ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of transfers
+    maps_to: TRANSACTS.event_time
+  - name: channel
+    dtype: VARCHAR
+    semantic_type: category
+    description: category of transfers
+    maps_to: TRANSACTS.channel
+  - name: status
+    dtype: VARCHAR
+    semantic_type: status
+    description: status of transfers
+    maps_to: TRANSACTS.status
+  - name: is_cross_border
+    dtype: BOOLEAN
+    semantic_type: flag
+    description: flag of transfers
+    maps_to: TRANSACTS.cross_border
+  - name: dest_country
+    dtype: VARCHAR
+    semantic_type: geo
+    description: geo of transfers
+    maps_to: TRANSACTS.corridor
+  - name: ccy
+    dtype: VARCHAR
+    semantic_type: currency
+    description: currency of transfers
+    maps_to: TRANSACTS.currency
+- name: users
+  description: users table of wallet_pay
+  primary_key:
+  - user_id
+  columns:
+  - name: user_id
+    dtype: VARCHAR
+    semantic_type: id
+    description: id of users
+    maps_to: Party.key
+  - name: phone_number
+    dtype: VARCHAR
+    semantic_type: phone
+    description: phone of users
+    pii: true
+    maps_to: Identifier.key
+  - name: name
+    dtype: VARCHAR
+    semantic_type: name
+    description: name of users
+    pii: true
+    maps_to: Party.full_name
+  - name: email
+    dtype: VARCHAR
+    semantic_type: email
+    description: email of users
+    pii: true
+    maps_to: Identifier.key
+  - name: kyc_id
+    dtype: VARCHAR
+    semantic_type: national_id
+    description: national id of users
+    pii: true
+    maps_to: Identifier.key
+  - name: signup_ts
+    dtype: BIGINT
+    semantic_type: timestamp
+    description: timestamp of users
+    maps_to: Party.time
+  - name: referrer_user_id
+    dtype: VARCHAR
+    semantic_type: text
+    description: text of users
+  - name: home_city
+    dtype: VARCHAR
+    semantic_type: geo
+    description: geo of users
+    maps_to: Party.city
