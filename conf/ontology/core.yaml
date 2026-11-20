@@ -1,0 +1,152 @@
+# Core ontology shared by every business domain.
+# A new product is onboarded by adding subtypes/attributes and a mapping spec,
+# never by adding a new core node type.
+#
+# scope:
+#   source - the node id is namespaced by source system (the same real-world
+#            thing appears once per source; entity resolution links them)
+#   global - the node id is the normalized value itself, so two sources that
+#            share a phone/device/location meet at the same node
+version: 0
+
+# Columns every canonical row must carry.
+lineage_columns: [source_system, domain, source_pk, ingested_at]
+
+nodes:
+  - name: Party
+    scope: source
+    subtypes: [person, organization, merchant]
+    time_column: valid_from
+    attributes:
+      - {name: full_name, type: string, pii: true}
+      - {name: trade_name, type: string}  # public name of a business; never a person's name
+      - {name: birth_date, type: date}  # quasi-identifier, kept in the graph for age features
+      - {name: gender, type: string}
+      - {name: income, type: double}
+      - {name: occupation, type: string}
+      - {name: segment, type: string}
+      - {name: category, type: string}
+      - {name: country, type: string}
+      - {name: city, type: string}
+
+  - name: Account
+    scope: source
+    subtypes: [wallet, bank, loan, savings, policy, loyalty]
+    time_column: valid_from
+    attributes:
+      - {name: status, type: string}
+      - {name: currency, type: string}
+      - {name: balance, type: double}
+      - {name: credit_limit, type: double}
+
+  - name: Device
+    scope: global
+    subtypes: [mobile, web, pos]
+    time_column: valid_from
+    attributes:
+      - {name: os, type: string}
+
+  - name: Identifier
+    scope: global
+    subtypes: [phone, email, national_id, address, ip, merchant_code, tax_id]
+    time_column: valid_from
+    attributes:
+      - {name: value, type: string, pii: true}
+
+  - name: Item
+    scope: source
+    subtypes: [loan_product, insurance_product, savings_product, trip, movie, voucher, goods]
+    time_column: valid_from
+    attributes:
+      - {name: title, type: string}
+      - {name: category, type: string}
+      - {name: price, type: double}
+
+  - name: Event
+    scope: source
+    subtypes: [application, loan, loan_performance, claim, booking, deposit, withdrawal, churn, fraud_case, chargeback, merchant_loan, merchant_loan_performance]
+    time_column: event_time
+    attributes:
+      - {name: amount, type: double}
+      - {name: currency, type: string}
+      - {name: status, type: string}
+      - {name: term_months, type: int}
+      - {name: days_past_due, type: int}
+      - {name: outcome_time, type: timestamp}
+      - {name: channel, type: string}
+
+  - name: Location
+    scope: global
+    subtypes: [city, country, geo_cell]
+    time_column: valid_from
+    attributes:
+      - {name: country, type: string}
+
+edges:
+  - name: OWNS
+    source: [Party]
+    target: [Account]
+    time_column: event_time
+    attributes: []
+
+  - name: USES
+    source: [Party]
+    target: [Device]
+    time_column: event_time
+    attributes: []
+
+  - name: HAS_IDENTIFIER
+    source: [Party]
+    target: [Identifier]
+    time_column: event_time
+    attributes: []
+
+  - name: TRANSACTS
+    source: [Party, Account]
+    target: [Party, Account]
+    time_column: event_time
+    attributes:
+      - {name: amount, type: double}
+      - {name: currency, type: string}
+      - {name: channel, type: string}
+      - {name: status, type: string}
+      - {name: cross_border, type: bool}
+      - {name: corridor, type: string}
+
+  - name: APPLIES_FOR
+    source: [Party]
+    target: [Event]
+    time_column: event_time
+    attributes: []
+
+  - name: PURCHASES
+    source: [Party]
+    target: [Item]
+    time_column: event_time
+    attributes:
+      - {name: amount, type: double}
+      - {name: currency, type: string}
+      - {name: quantity, type: int}
+      - {name: voucher_code, type: string}
+      - {name: status, type: string}
+
+  - name: REFERS
+    source: [Party]
+    target: [Party]
+    time_column: event_time
+    attributes:
+      - {name: relation, type: string}
+
+  - name: LOCATED_AT
+    source: [Party]
+    target: [Location]
+    time_column: event_time
+    attributes: []
+
+  # Links a follow-up event to the event it belongs to
+  # (loan performance -> loan, claim -> policy purchase event).
+  - name: RELATES_TO
+    source: [Event]
+    target: [Event, Account]
+    time_column: event_time
+    attributes: []

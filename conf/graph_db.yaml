@@ -1,0 +1,5 @@
+# The platform's graph database. The password comes from the GP_NEO4J_PASSWORD environment variable.
+uri: bolt://localhost:7687
+user: neo4j
+database: neo4j
+import_dir: .tools/neo4j-community-5.26.0/import   # directory Neo4j reads LOAD CSV files from
